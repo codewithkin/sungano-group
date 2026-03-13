@@ -1,0 +1,144 @@
+enum ShipmentStatus {
+  PENDING
+  ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+enum TripStatus {
+  PLANNED
+  DISPATCHED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum StopType {
+  PICKUP
+  DELIVERY
+  FUEL
+  REST
+  INSPECTION
+}
+
+enum StopStatus {
+  PENDING
+  EN_ROUTE
+  ARRIVED
+  COMPLETED
+  SKIPPED
+}
+
+model Customer {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  address     String?
+  city        String?
+  province    String?
+  postalCode  String?
+  lat         Float?
+  lng         Float?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  shipments   Shipment[]
+
+  @@map("customer")
+}
+
+model Shipment {
+  id                  String          @id @default(cuid())
+  referenceNumber     String          @unique
+  customerId          String
+  customer            Customer        @relation(fields: [customerId], references: [id])
+  description         String
+  weight              Float?
+  volume              Float?
+  specialInstructions String?
+  status              ShipmentStatus  @default(PENDING)
+  pickupAddress       String
+  pickupLat           Float?
+  pickupLng           Float?
+  deliveryAddress     String
+  deliveryLat         Float?
+  deliveryLng         Float?
+  requestedPickup     DateTime
+  requestedDelivery   DateTime
+  actualPickup        DateTime?
+  actualDelivery      DateTime?
+  proofOfDelivery     String?
+  tripId              String?
+  trip                Trip?           @relation(fields: [tripId], references: [id])
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  stops               Stop[]
+  statusUpdates       StatusUpdate[]
+
+  @@index([customerId])
+  @@index([tripId])
+  @@index([status])
+  @@map("shipment")
+}
+
+model Trip {
+  id                String      @id @default(cuid())
+  tripNumber        String      @unique
+  driverId          String
+  driver            Driver      @relation(fields: [driverId], references: [id])
+  truckId           String
+  truck             Truck       @relation(fields: [truckId], references: [id])
+  trailerId         String?
+  trailer           Trailer?    @relation(fields: [trailerId], references: [id])
+  status            TripStatus  @default(PLANNED)
+  plannedStartTime  DateTime
+  plannedEndTime    DateTime
+  actualStartTime   DateTime?
+  actualEndTime     DateTime?
+  plannedDistanceKm Float?
+  actualDistanceKm  Float?
+  notes             String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  shipments         Shipment[]
+  stops             Stop[]
+  fuelLogs          FuelLog[]
+  expenses          Expense[]
+  statusUpdates     StatusUpdate[]
+
+  @@index([driverId])
+  @@index([truckId])
+  @@index([status])
+  @@map("trip")
+}
+
+model Stop {
+  id                String      @id @default(cuid())
+  tripId            String
+  trip              Trip        @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  shipmentId        String?
+  shipment          Shipment?   @relation(fields: [shipmentId], references: [id])
+  sequence          Int
+  type              StopType
+  address           String
+  lat               Float?
+  lng               Float?
+  plannedArrival    DateTime?
+  plannedDeparture  DateTime?
+  actualArrival     DateTime?
+  actualDeparture   DateTime?
+  notes             String?
+  status            StopStatus  @default(PENDING)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([tripId])
+  @@index([shipmentId])
+  @@map("stop")
+}
