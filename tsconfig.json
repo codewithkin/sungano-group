@@ -1,0 +1,3 @@
+{
+  "extends": "@sungano-group/config/tsconfig.base.json"
+}
