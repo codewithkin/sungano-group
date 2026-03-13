@@ -2,6 +2,7 @@ import { protectedProcedure, publicProcedure, router } from "../index";
 import { truckRouter } from "./truck";
 import { trailerRouter } from "./trailer";
 import { maintenanceRouter } from "./maintenance";
+import { driverRouter } from "./driver";
 
 export const appRouter = router({
   healthCheck: publicProcedure.query(() => {
@@ -16,5 +17,6 @@ export const appRouter = router({
   truck: truckRouter,
   trailer: trailerRouter,
   maintenance: maintenanceRouter,
+  driver: driverRouter,
 });
 export type AppRouter = typeof appRouter;
