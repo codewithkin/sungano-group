@@ -1,0 +1,129 @@
+enum ExpenseCategory {
+  FUEL
+  TOLLS
+  MAINTENANCE
+  ACCOMMODATION
+  FINES
+  PERMITS
+  OTHER
+}
+
+enum UpdateType {
+  INFO
+  WARNING
+  DELAY
+  LOCATION
+  DELIVERY_CONFIRMED
+  PICKUP_CONFIRMED
+  ISSUE
+}
+
+enum IncidentType {
+  ACCIDENT
+  BREAKDOWN
+  DELAY
+  COMPLIANCE
+  THEFT
+  WEATHER
+  OTHER
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model FuelLog {
+  id            String   @id @default(cuid())
+  truckId       String
+  truck         Truck    @relation(fields: [truckId], references: [id])
+  tripId        String?
+  trip          Trip?    @relation(fields: [tripId], references: [id])
+  litres        Float
+  costPerLitre  Float
+  totalCost     Float
+  mileageAt     Int
+  station       String?
+  date          DateTime
+  createdAt     DateTime @default(now())
+
+  @@index([truckId])
+  @@index([tripId])
+  @@index([date])
+  @@map("fuel_log")
+}
+
+model Expense {
+  id          String          @id @default(cuid())
+  tripId      String?
+  trip        Trip?           @relation(fields: [tripId], references: [id])
+  category    ExpenseCategory
+  description String
+  amount      Float
+  date        DateTime
+  receiptUrl  String?
+  createdAt   DateTime        @default(now())
+
+  @@index([tripId])
+  @@index([category])
+  @@map("expense")
+}
+
+model StatusUpdate {
+  id                  String     @id @default(cuid())
+  tripId              String?
+  trip                Trip?      @relation(fields: [tripId], references: [id])
+  shipmentId          String?
+  shipment            Shipment?  @relation(fields: [shipmentId], references: [id])
+  authorId            String
+  message             String
+  type                UpdateType
+  isVisibleToCustomer Boolean    @default(false)
+  createdAt           DateTime   @default(now())
+
+  @@index([tripId])
+  @@index([shipmentId])
+  @@map("status_update")
+}
+
+model Incident {
+  id          String       @id @default(cuid())
+  driverId    String?
+  driver      Driver?      @relation(fields: [driverId], references: [id])
+  truckId     String?
+  truck       Truck?       @relation(fields: [truckId], references: [id])
+  type        IncidentType
+  severity    Severity
+  description String
+  location    String?
+  lat         Float?
+  lng         Float?
+  reportedAt  DateTime     @default(now())
+  resolvedAt  DateTime?
+  resolution  String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([driverId])
+  @@index([truckId])
+  @@index([severity])
+  @@map("incident")
+}
+
+model PerformanceScore {
+  id                  String   @id @default(cuid())
+  driverId            String
+  driver              Driver   @relation(fields: [driverId], references: [id])
+  period              DateTime
+  onTimeDeliveryPct   Float
+  fuelEfficiency      Float?
+  safetyScore         Float?
+  hoursCompliance     Float?
+  customerRating      Float?
+  createdAt           DateTime @default(now())
+
+  @@unique([driverId, period])
+  @@map("performance_score")
+}
