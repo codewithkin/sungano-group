@@ -1,0 +1,63 @@
+enum DriverStatus {
+  AVAILABLE
+  ON_TRIP
+  OFF_DUTY
+  SUSPENDED
+}
+
+model Driver {
+  id                 String         @id @default(cuid())
+  userId             String         @unique
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenseNumber      String         @unique
+  licenseClass       String
+  licenseExpiry      DateTime
+  phoneNumber        String
+  status             DriverStatus   @default(AVAILABLE)
+  hireDate           DateTime
+  medicalExpiryDate  DateTime?
+  emergencyContact   String?
+  emergencyPhone     String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  assignments        DriverAssignment[]
+  trips              Trip[]
+  hoursLogs          HoursOfServiceLog[]
+  incidents          Incident[]
+  performanceScores  PerformanceScore[]
+
+  @@map("driver")
+}
+
+model DriverAssignment {
+  id         String    @id @default(cuid())
+  driverId   String
+  driver     Driver    @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  truckId    String
+  truck      Truck     @relation(fields: [truckId], references: [id], onDelete: Cascade)
+  startDate  DateTime  @default(now())
+  endDate    DateTime?
+  isCurrent  Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+
+  @@index([driverId])
+  @@index([truckId])
+  @@map("driver_assignment")
+}
+
+model HoursOfServiceLog {
+  id          String   @id @default(cuid())
+  driverId    String
+  driver      Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  date        DateTime
+  drivingHrs  Float    @default(0)
+  onDutyHrs   Float    @default(0)
+  sleeperHrs  Float    @default(0)
+  offDutyHrs  Float    @default(0)
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@index([driverId, date])
+  @@map("hours_of_service_log")
+}
