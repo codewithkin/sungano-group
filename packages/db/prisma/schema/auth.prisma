@@ -1,13 +1,23 @@
+enum UserRole {
+  ADMIN
+  DISPATCHER
+  DRIVER
+  CUSTOMER
+}
+
 model User {
   id            String    @id
   name          String
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  role          UserRole  @default(DISPATCHER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+
+  driver        Driver?
 
   @@unique([email])
   @@map("user")

@@ -21,5 +21,14 @@ export const auth = betterAuth({
       httpOnly: true,
     },
   },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "DISPATCHER",
+        input: true,
+      },
+    },
+  },
   plugins: [],
 });

@@ -23,3 +23,20 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
     },
   });
 });
+
+function createRoleProcedure(allowedRoles: string[]) {
+  return protectedProcedure.use(({ ctx, next }) => {
+    const userRole = (ctx.session.user as Record<string, unknown>).role as string | undefined;
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: `Access denied. Required roles: ${allowedRoles.join(", ")}`,
+      });
+    }
+    return next({ ctx });
+  });
+}
+
+export const adminProcedure = createRoleProcedure(["ADMIN"]);
+export const dispatcherProcedure = createRoleProcedure(["ADMIN", "DISPATCHER"]);
+export const driverProcedure = createRoleProcedure(["ADMIN", "DISPATCHER", "DRIVER"]);
