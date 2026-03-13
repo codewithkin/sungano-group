@@ -1,0 +1,122 @@
+enum FleetStatus {
+  AVAILABLE
+  IN_TRANSIT
+  MAINTENANCE
+  OUT_OF_SERVICE
+}
+
+enum FuelType {
+  DIESEL
+  PETROL
+  LNG
+  ELECTRIC
+}
+
+enum TrailerType {
+  FLATBED
+  REEFER
+  DRY_VAN
+  TANKER
+  LOWBED
+  CURTAIN_SIDE
+  CONTAINER
+}
+
+enum MaintenanceType {
+  SCHEDULED
+  UNSCHEDULED
+  INSPECTION
+}
+
+enum MaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Truck {
+  id                  String        @id @default(cuid())
+  unitNumber          String        @unique
+  vin                 String        @unique
+  make                String
+  model               String
+  year                Int
+  licensePlate        String
+  status              FleetStatus   @default(AVAILABLE)
+  mileage             Int           @default(0)
+  fuelType            FuelType      @default(DIESEL)
+  tankCapacityLitres  Float
+  currentLocationLat  Float?
+  currentLocationLng  Float?
+  lastLocationUpdate  DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  assignments         DriverAssignment[]
+  trips               Trip[]
+  maintenanceLogs     MaintenanceLog[]
+  fuelLogs            FuelLog[]
+  documents           FleetDocument[]
+  incidents           Incident[]
+
+  @@map("truck")
+}
+
+model Trailer {
+  id              String        @id @default(cuid())
+  unitNumber      String        @unique
+  type            TrailerType
+  capacityTonnes  Float
+  licensePlate    String
+  status          FleetStatus   @default(AVAILABLE)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  trips           Trip[]
+  maintenanceLogs MaintenanceLog[]
+  documents       FleetDocument[]
+
+  @@map("trailer")
+}
+
+model MaintenanceLog {
+  id               String            @id @default(cuid())
+  type             MaintenanceType
+  description      String
+  cost             Float             @default(0)
+  mileageAtService Int?
+  scheduledDate    DateTime
+  completedDate    DateTime?
+  status           MaintenanceStatus @default(SCHEDULED)
+  vendorName       String?
+  truckId          String?
+  truck            Truck?            @relation(fields: [truckId], references: [id])
+  trailerId        String?
+  trailer          Trailer?          @relation(fields: [trailerId], references: [id])
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([truckId])
+  @@index([trailerId])
+  @@index([scheduledDate])
+  @@map("maintenance_log")
+}
+
+model FleetDocument {
+  id          String    @id @default(cuid())
+  truckId     String?
+  truck       Truck?    @relation(fields: [truckId], references: [id])
+  trailerId   String?
+  trailer     Trailer?  @relation(fields: [trailerId], references: [id])
+  type        String
+  name        String
+  fileUrl     String
+  expiryDate  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([truckId])
+  @@index([trailerId])
+  @@map("fleet_document")
+}
