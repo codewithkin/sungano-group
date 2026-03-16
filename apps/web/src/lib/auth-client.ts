@@ -3,11 +3,31 @@ import { env } from "@sungano-group/env/web";
 const baseURL = env.NEXT_PUBLIC_SERVER_URL;
 
 async function handleResponse<T>(res: Response): Promise<T> {
+  // Read raw response body as text first so we can extract meaningful
+  // error messages when the server returns JSON like { message: "..." }.
+  const text = await res.text();
+
+  // Try to parse JSON if present.
+  let data: unknown = undefined;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text;
+    }
+  }
+
   if (!res.ok) {
-    const message = await res.text();
+    // Prefer `message` field when the server returned structured JSON.
+    const message = (typeof data === "object" && data !== null && "message" in (data as any))
+      ? (data as any).message
+      : (typeof data === "string" ? data : undefined);
+
     throw new Error(message || "Request failed");
   }
-  return res.json() as Promise<T>;
+
+  // Successful response: return parsed JSON when available, otherwise return raw text.
+  return (data !== undefined ? data : (undefined as unknown)) as T;
 }
 
 export function login(payload: { username: string; password: string }) {
