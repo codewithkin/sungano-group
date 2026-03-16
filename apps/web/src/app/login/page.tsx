@@ -9,6 +9,7 @@ import { Card } from "@sungano-group/ui/components/card";
 import { Input } from "@sungano-group/ui/components/input";
 import { Label } from "@sungano-group/ui/components/label";
 import Image from "next/image";
+import { Loader2Icon } from "lucide-react";
 import { login } from "@/lib/auth-client";
 
 export default function Login () {
@@ -87,11 +88,15 @@ export default function Login () {
               />
             </article>
 
-            <Button
-              type="submit"
-              disabled={loginMutation.isPending}
-            >
-              {loginMutation.isPending ? "Signing in..." : "Sign me in"}
+            <Button type="submit" disabled={loginMutation.isPending}>
+              {loginMutation.isPending ? (
+                <span className="flex items-center gap-2">
+                  <Loader2Icon className="animate-spin size-4" />
+                  signing you in...
+                </span>
+              ) : (
+                "Sign me in"
+              )}
             </Button>
           </form>
         </article>
