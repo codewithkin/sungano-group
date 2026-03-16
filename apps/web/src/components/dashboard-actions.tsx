@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Building2,
   DollarSign,
@@ -405,6 +405,9 @@ function CreateCostDialog({ open, onClose }: DialogProps) {
     onError: (err) => toast.error(err.message),
   });
 
+  const trips = useQuery(trpc.trip.list.queryOptions({ limit: 100 }));
+  const tripOptions = trips.data?.items ?? [];
+
   const today = new Date().toISOString().slice(0, 10);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -459,8 +462,24 @@ function CreateCostDialog({ open, onClose }: DialogProps) {
               <Input id="amount" name="amount" type="number" min="0" step="0.01" placeholder="0.00" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tripId">Trip ID (optional)</Label>
-              <Input id="tripId" name="tripId" placeholder="Trip reference" />
+              <Label htmlFor="tripId">Trip (optional)</Label>
+              <Select
+                name="tripId"
+                defaultValue=""
+                disabled={trips.isLoading || trips.isError || tripOptions.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={trips.isLoading ? "Loading trips..." : tripOptions.length ? "Select trip" : "No trips"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No trip</SelectItem>
+                  {tripOptions.map((trip) => (
+                    <SelectItem key={trip.id} value={trip.id}>
+                      {trip.tripNumber}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="receiptUrl">Receipt URL</Label>
@@ -498,6 +517,14 @@ function CreateTripDialog({ open, onClose }: DialogProps) {
   const defaultStart = new Date(now.getTime() + 30 * 60 * 1000).toISOString().slice(0, 16);
   const defaultEnd = new Date(now.getTime() + 3 * 60 * 60 * 1000).toISOString().slice(0, 16);
 
+  const drivers = useQuery(trpc.driver.list.queryOptions({ limit: 100 }));
+  const trucks = useQuery(trpc.truck.list.queryOptions({ limit: 100 }));
+  const trailers = useQuery(trpc.trailer.list.queryOptions({ limit: 100 }));
+
+  const driverOptions = drivers.data?.items ?? [];
+  const truckOptions = trucks.data?.items ?? [];
+  const trailerOptions = trailers.data?.items ?? [];
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -522,16 +549,62 @@ function CreateTripDialog({ open, onClose }: DialogProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="driverId">Driver ID</Label>
-              <Input id="driverId" name="driverId" placeholder="Driver reference" required />
+              <Label htmlFor="driverId">Driver</Label>
+              <Select
+                name="driverId"
+                required
+                disabled={drivers.isLoading || drivers.isError || driverOptions.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={drivers.isLoading ? "Loading drivers..." : driverOptions.length ? "Select driver" : "No drivers"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {driverOptions.map((driver) => (
+                    <SelectItem key={driver.id} value={driver.id}>
+                      {driver.user?.name ?? "Unassigned"} • {driver.licenseNumber}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="truckId">Truck ID</Label>
-              <Input id="truckId" name="truckId" placeholder="Truck reference" required />
+              <Label htmlFor="truckId">Truck</Label>
+              <Select
+                name="truckId"
+                required
+                disabled={trucks.isLoading || trucks.isError || truckOptions.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={trucks.isLoading ? "Loading trucks..." : truckOptions.length ? "Select truck" : "No trucks"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {truckOptions.map((truck) => (
+                    <SelectItem key={truck.id} value={truck.id}>
+                      {truck.unitNumber} • {truck.make} {truck.model}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="trailerId">Trailer ID</Label>
-              <Input id="trailerId" name="trailerId" placeholder="Optional" />
+              <Label htmlFor="trailerId">Trailer</Label>
+              <Select
+                name="trailerId"
+                defaultValue=""
+                disabled={trailers.isLoading || trailers.isError}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={trailers.isLoading ? "Loading trailers..." : trailerOptions.length ? "Select trailer" : "No trailer"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No trailer</SelectItem>
+                  {trailerOptions.map((trailer) => (
+                    <SelectItem key={trailer.id} value={trailer.id}>
+                      {trailer.unitNumber} • {trailer.type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="plannedDistanceKm">Planned Distance (km)</Label>
