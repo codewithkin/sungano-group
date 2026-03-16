@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Truck,
@@ -14,6 +15,7 @@ import {
   DollarSign,
   BarChart3,
   AlertTriangle,
+  ChevronDown,
 } from "lucide-react";
 
 import {
@@ -29,6 +31,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@sungano-group/ui/components/sidebar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@sungano-group/ui/components/collapsible";
 import { Separator } from "@sungano-group/ui/components/separator";
 import UserMenu from "./user-menu";
 
@@ -67,11 +70,32 @@ const navGroups = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    "Fleet Management": true,
+    "Operations": true,
+    "Finance & Analytics": false,
+  });
+
+  const toggleGroup = (label: string) => {
+    setOpenGroups((prev) => ({
+      ...prev,
+      [label]: !prev[label],
+    }));
+  };
+
+  // Check if a group has an active item
+  const isGroupActive = (group: typeof navGroups[0]) => {
+    return group.items.some(
+      (item) =>
+        pathname === item.href ||
+        (item.href !== "/dashboard" && pathname.startsWith(item.href))
+    );
+  };
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader className="border-b border-sidebar-border">
-        <Link href="/dashboard" className="flex items-center gap-3 px-2 py-2">
+        <Link href="/dashboard" className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-sidebar-accent transition-colors">
           <Image
             src="/logo.jpeg"
             alt="Sungano Group"
@@ -89,34 +113,49 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {navGroups.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) => {
-                  const isActive =
-                    pathname === item.href ||
-                    (item.href !== "/dashboard" && pathname.startsWith(item.href));
-                  return (
-                    <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive}
-                        tooltip={item.title}
-                      >
-                        <Link href={item.href}>
-                          <item.icon className="size-4" />
-                          <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        {navGroups.map((group) => {
+          const groupActive = isGroupActive(group);
+          const isOpen = openGroups[group.label] ?? true;
+
+          return (
+            <Collapsible key={group.label} open={isOpen} onOpenChange={() => toggleGroup(group.label)} className="group/collapsible">
+              <SidebarGroup>
+                <SidebarGroupLabel asChild className={groupActive ? "text-sidebar-primary font-semibold" : ""}>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full cursor-pointer hover:text-foreground transition-colors">
+                    <span>{group.label}</span>
+                    <ChevronDown className="size-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                  </CollapsibleTrigger>
+                </SidebarGroupLabel>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {group.items.map((item) => {
+                        const isActive =
+                          pathname === item.href ||
+                          (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                        return (
+                          <SidebarMenuItem key={item.href}>
+                            <SidebarMenuButton
+                              asChild
+                              isActive={isActive}
+                              tooltip={item.title}
+                              className={isActive ? "bg-sidebar-primary text-sidebar-primary-foreground font-medium" : ""}
+                            >
+                              <Link href={item.href}>
+                                <item.icon className="size-4" />
+                                <span>{item.title}</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
+          );
+        })}
       </SidebarContent>
 
       <SidebarFooter>
