@@ -53,20 +53,20 @@ export default function SignInForm() {
 
   return (
     <Card className="shadow-none border-0 p-0">
-      <CardHeader className="px-0 pb-6 space-y-3">
+      <CardHeader className="px-0 pb-6 space-y-4">
         <div className="flex items-center justify-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent">
             <Mail className="h-5 w-5 text-primary" />
           </div>
         </div>
-        <div className="space-y-2">
-          <CardTitle className="text-center text-2xl font-semibold">Sign in to Sungano</CardTitle>
-          <CardDescription className="text-center text-sm text-muted-foreground">
+        <div className="space-y-2 text-center">
+          <CardTitle className="text-2xl font-semibold">Sign in to Sungano</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
             Access to this system is by invitation only.
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="px-0 space-y-4">
+      <CardContent className="px-0 space-y-5">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -80,15 +80,19 @@ export default function SignInForm() {
             <form.Field name="username">
               {(field) => (
                 <div className="space-y-1">
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    type="text"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="your-username"
-                  />
+                  <div className="flex items-center gap-3 rounded-[12px] border border-input bg-white px-4 py-3 shadow-[inset_0_1px_0_rgba(15,23,42,0.04)] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="text"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="your-username"
+                      className="border-0 px-0 py-0 shadow-none focus-visible:ring-0 focus-visible:border-none"
+                    />
+                  </div>
                   {field.state.meta.errors.map((error) => (
                     <p key={error?.message} className="text-sm text-destructive">
                       {error?.message}
@@ -134,25 +138,14 @@ export default function SignInForm() {
           </form.Subscribe>
         </form>
 
-        <div className="flex items-center gap-3 pt-2">
-          <div className="h-px flex-1 bg-border" />
-          <span className="text-xs font-medium text-muted-foreground">OR</span>
-          <div className="h-px flex-1 bg-border" />
+        <div className="space-y-1 pt-2 text-center">
+          <p className="text-xs text-muted-foreground">
+            By signing in, you agree to the Terms of Service and Privacy Policy.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Need help? <a className="text-primary font-semibold" href="#">Contact support</a>
+          </p>
         </div>
-
-        <Button variant="outline" className="w-full" type="button">
-          <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <text x="12" y="15" textAnchor="middle" fontSize="8" fontWeight="bold" fill="currentColor">
-              G
-            </text>
-          </svg>
-          Continue with Google
-        </Button>
-
-        <p className="text-xs text-muted-foreground text-center pt-2">
-          By signing in, you agree to the Terms of Service and Privacy Policy.
-        </p>
       </CardContent>
     </Card>
   );
