@@ -45,12 +45,12 @@ export default function Login () {
       backgroundRepeat: "no-repeat",
       backgroundSize: "cover",
     }}
-    className="md:px-20 lg:px-40 py-36 justify-center items-center flex">
+    className="md:px-20 lg:px-40 py-36 justify-center items-center h-full flex">
       {/* Actual login form */}
       <motion.div
-        initial={{ y: 30, opacity: 0 }}
+        initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: 1, ease: "easeOut" }}
       >
         <Card className="w-fit backdrop-blur-lg bg-white/10 border border-white/20 p-2">
         {/* Welcome message and logo */}
