@@ -1,6 +1,6 @@
 import { z } from "zod";
 import prisma from "@sungano-group/db";
-import { router, dispatcherProcedure, protectedProcedure } from "../index";
+import { router, dispatcherProcedure, managerProcedure, protectedProcedure } from "../index";
 
 function generateTripNumber() {
   const ts = Date.now().toString(36).toUpperCase();
@@ -178,7 +178,7 @@ export const tripRouter = router({
     }),
 
   /** Cancel a trip */
-  cancel: dispatcherProcedure
+  cancel: managerProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input }) => {
       // Unassign shipments

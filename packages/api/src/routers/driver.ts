@@ -48,6 +48,27 @@ export const driverRouter = router({
       return { items, nextCursor };
     }),
 
+  me: protectedProcedure.query(async ({ ctx }) => {
+    return prisma.driver.findUniqueOrThrow({
+      where: { userId: ctx.session.user.id },
+      include: {
+        user: { select: { id: true, name: true, email: true, image: true } },
+        assignments: {
+          orderBy: { startDate: "desc" },
+          include: { truck: { select: { id: true, unitNumber: true, make: true, model: true } } },
+        },
+        hoursLogs: { orderBy: { date: "desc" }, take: 14 },
+        trips: {
+          orderBy: { createdAt: "desc" },
+          take: 10,
+          include: { truck: { select: { unitNumber: true } } },
+        },
+        performanceScores: { orderBy: { period: "desc" }, take: 6 },
+        incidents: { orderBy: { reportedAt: "desc" }, take: 5 },
+      },
+    });
+  }),
+
   byId: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
