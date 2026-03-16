@@ -1,14 +1,53 @@
+"use client";
+
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@sungano-group/ui/components/button";
+import { Card } from "@sungano-group/ui/components/card";
 import { Input } from "@sungano-group/ui/components/input";
 import { Label } from "@sungano-group/ui/components/label";
 import Image from "next/image";
+import { login } from "@/lib/auth-client";
 
 export default function Login () {
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const loginMutation = useMutation({
+    mutationFn: (payload: { username: string; password: string }) => login(payload),
+    onSuccess: () => {
+      toast.success("Login successful!");
+      router.push("/dashboard");
+    },
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : "Login failed";
+      toast.error(message);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    loginMutation.mutate({ username, password });
+  };
   return (
-    <section className="grid md:grid-cols-2">
+    <section 
+    style={{
+      backgroundImage: "url('/images/white-truck.jpeg')",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+    }}
+    className="md:px-20 lg:px-40 py-36 justify-center items-center flex">
       {/* Actual login form */}
-      <article className="px-40 py-36">
+      <Card className="w-fit backdrop-blur-lg bg-white/10 border border-white/20 p-2">
         {/* Welcome message and logo */}
-        <article className="flex flex-col gap-4 pb-8">
+        <article className="flex flex-col gap-4 pt-2 px-4 justify-center items-center">
           <Image
           src="/logo.jpeg"
           alt="Sungano Group Logo"
@@ -16,33 +55,47 @@ export default function Login () {
           height={48}
           className="rounded-full"
         />
-        <h1 className="text-xl font-medium">Welcome to Sungano Group</h1>
+        <h1 className="text-xl font-semibold text-center text-white">Welcome to Sungano Group</h1>
         </article>
 
-        <article className="flex flex-col gap-4">
-          <article className="flex flex-col gap-2">
-          <Label htmlFor="username">Username</Label>
-          <Input
-            id="username"
-            name="username"
-            placeholder="joshuasmith"
-          />
-        </article>
+        <article className="flex flex-col gap-4 bg-white rounded-2xl p-8">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <article className="flex flex-col gap-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                placeholder="joshuasmith"
+                className="md:min-w-100 w-full"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={loginMutation.isPending}
+              />
+            </article>
 
-        <article className="flex flex-col gap-2">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            name="password"
-            placeholder="********"
-            type="password"
-          />
-        </article>
-        </article>
-      </article>
+            <article className="flex flex-col gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                placeholder="********"
+                type="password"
+                className="md:min-w-100 w-full"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loginMutation.isPending}
+              />
+            </article>
 
-      {/* White truck creative */}
-      <article></article>
+            <Button
+              type="submit"
+              disabled={loginMutation.isPending}
+            >
+              {loginMutation.isPending ? "Signing in..." : "Sign me in"}
+            </Button>
+          </form>
+        </article>
+      </Card>
     </section>
   )
 }
