@@ -10,6 +10,7 @@ import { Input } from "@sungano-group/ui/components/input";
 import { Label } from "@sungano-group/ui/components/label";
 import Image from "next/image";
 import { Loader2Icon } from "lucide-react";
+import { motion } from "framer-motion";
 import { login } from "@/lib/auth-client";
 
 export default function Login () {
@@ -46,7 +47,12 @@ export default function Login () {
     }}
     className="md:px-20 lg:px-40 py-36 justify-center items-center flex">
       {/* Actual login form */}
-      <Card className="w-fit backdrop-blur-lg bg-white/10 border border-white/20 p-2">
+      <motion.div
+        initial={{ y: 30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <Card className="w-fit backdrop-blur-lg bg-white/10 border border-white/20 p-2">
         {/* Welcome message and logo */}
         <article className="flex flex-col gap-4 pt-2 px-4 justify-center items-center">
           <Image
@@ -120,7 +126,8 @@ export default function Login () {
             </div>
           </form>
         </article>
-      </Card>
+        </Card>
+      </motion.div>
     </section>
   )
 }
