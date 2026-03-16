@@ -7,7 +7,7 @@
     "@sungano-group/db": "workspace:*",
     "@sungano-group/env": "workspace:*",
     "bcryptjs": "^2.4.3",
-    "jose": "^5.1.3"
+    "jose": "^6.2.1"
   },
   "devDependencies": {
     "@sungano-group/config": "workspace:*",
