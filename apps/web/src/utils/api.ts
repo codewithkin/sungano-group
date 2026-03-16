@@ -22,4 +22,12 @@ function patch<T = unknown, B = unknown>(url: string, body?: B, config?: AxiosRe
   return client.patch<T>(url, body, config).then((res) => res.data);
 }
 
-export const api = { get, post, patch };
+function put<T = unknown, B = unknown>(url: string, body?: B, config?: AxiosRequestConfig) {
+  return client.put<T>(url, body, config).then((res) => res.data);
+}
+
+function del<T = unknown>(url: string, config?: AxiosRequestConfig) {
+  return client.delete<T>(url, config).then((res) => res.data);
+}
+
+export const api = { get, post, patch, put, del };
