@@ -31,7 +31,6 @@ import {
 } from "@sungano-group/ui/components/sidebar";
 import { Separator } from "@sungano-group/ui/components/separator";
 import UserMenu from "./user-menu";
-import { ModeToggle } from "./mode-toggle";
 
 const navGroups = [
   {
@@ -122,8 +121,7 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <Separator className="mb-2" />
-        <div className="flex items-center justify-between px-2 pb-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
-          <ModeToggle />
+        <div className="flex items-center justify-end px-2 pb-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
           <UserMenu />
         </div>
       </SidebarFooter>
