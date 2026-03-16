@@ -60,7 +60,12 @@ export default function Login () {
         </article>
 
         <article className="flex flex-col gap-4 bg-white rounded-2xl p-8">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-4"
+            aria-busy={loginMutation.isPending}
+            aria-live="polite"
+          >
             <article className="flex flex-col gap-2">
               <Label htmlFor="username">Username</Label>
               <Input
@@ -88,7 +93,11 @@ export default function Login () {
               />
             </article>
 
-            <Button type="submit" disabled={loginMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={loginMutation.isPending}
+              aria-disabled={loginMutation.isPending}
+            >
               {loginMutation.isPending ? (
                 <span className="flex items-center gap-2">
                   <Loader2Icon className="animate-spin size-4" />
@@ -98,6 +107,17 @@ export default function Login () {
                 "Sign me in"
               )}
             </Button>
+
+            {/* Screen reader status updates */}
+            <div className="sr-only" role="status" aria-live="polite">
+              {loginMutation.isPending
+                ? "Signing you in..."
+                : loginMutation.isError
+                ? `Error: ${loginMutation.error instanceof Error ? loginMutation.error.message : "Login failed"}`
+                : loginMutation.isSuccess
+                ? "Signed in"
+                : ""}
+            </div>
           </form>
         </article>
       </Card>
