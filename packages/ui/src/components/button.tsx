@@ -3,7 +3,7 @@ import { cn } from "@sungano-group/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-[10px] border border-transparent bg-clip-padding text-sm font-semibold whitespace-nowrap transition-all outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-60 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-[8px] border border-transparent bg-clip-padding text-sm font-semibold whitespace-nowrap transition-all outline-none select-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-60 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/30 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -20,14 +20,14 @@ const buttonVariants = cva(
       },
       size: {
         default:
-          "h-11 gap-2 px-4 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
-        xs: "h-8 gap-1.5 rounded-[8px] px-3 text-xs [&_svg:not([class*='size-'])]:size-3.5",
-        sm: "h-10 gap-1.5 rounded-[10px] px-4 text-sm",
-        lg: "h-12 gap-2 rounded-[12px] px-5 text-base",
+          "h-12 gap-2 px-4 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
+        xs: "h-8 gap-1.5 rounded-[6px] px-3 text-xs [&_svg:not([class*='size-'])]:size-3.5",
+        sm: "h-10 gap-1.5 rounded-[8px] px-4 text-sm",
+        lg: "h-12 gap-2 rounded-[10px] px-5 text-base",
         icon: "size-11",
-        "icon-xs": "size-8 rounded-[8px] [&_svg:not([class*='size-'])]:size-3.5",
-        "icon-sm": "size-9 rounded-[9px]",
-        "icon-lg": "size-12 rounded-[12px]",
+        "icon-xs": "size-8 rounded-[6px] [&_svg:not([class*='size-'])]:size-3.5",
+        "icon-sm": "size-9 rounded-[8px]",
+        "icon-lg": "size-12 rounded-[10px]",
       },
     },
     defaultVariants: {

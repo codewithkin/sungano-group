@@ -53,16 +53,18 @@ export default function SignInForm() {
 
   return (
     <Card className="shadow-none border-0 p-0">
-      <CardHeader className="px-0">
-        <div className="flex items-center justify-center mb-4">
+      <CardHeader className="px-0 pb-6 space-y-3">
+        <div className="flex items-center justify-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent">
             <Mail className="h-5 w-5 text-primary" />
           </div>
         </div>
-        <CardTitle className="text-center text-2xl">Sign in</CardTitle>
-        <CardDescription className="text-center text-sm">
-          Access to this system is by invitation only.
-        </CardDescription>
+        <div className="space-y-2">
+          <CardTitle className="text-center text-2xl font-semibold">Sign in to Sungano</CardTitle>
+          <CardDescription className="text-center text-sm text-muted-foreground">
+            Access to this system is by invitation only.
+          </CardDescription>
+        </div>
       </CardHeader>
       <CardContent className="px-0 space-y-4">
         <form
@@ -74,22 +76,19 @@ export default function SignInForm() {
           className="space-y-4"
         >
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-sm text-muted-foreground">Username</Label>
+            <Label htmlFor="username" className="text-sm font-medium text-foreground">Enter your username</Label>
             <form.Field name="username">
               {(field) => (
                 <div className="space-y-1">
-                  <div className="flex items-center gap-3 rounded-[12px] border border-input bg-white px-3 py-2 shadow-[inset_0_1px_0_rgba(15,23,42,0.04)]">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      type="text"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="border-0 px-0 shadow-none focus-visible:ring-0 focus-visible:border-none"
-                    />
-                  </div>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="text"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="your-username"
+                  />
                   {field.state.meta.errors.map((error) => (
                     <p key={error?.message} className="text-sm text-destructive">
                       {error?.message}
@@ -101,7 +100,7 @@ export default function SignInForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm text-muted-foreground">Password</Label>
+            <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
             <form.Field name="password">
               {(field) => (
                 <div className="space-y-1">
@@ -112,6 +111,7 @@ export default function SignInForm() {
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="Enter password"
                   />
                   {field.state.meta.errors.map((error) => (
                     <p key={error?.message} className="text-sm text-destructive">
@@ -127,30 +127,30 @@ export default function SignInForm() {
             selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}
           >
             {({ canSubmit, isSubmitting }) => (
-              <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting || isPending}>
+              <Button type="submit" className="w-full mt-6" disabled={!canSubmit || isSubmitting || isPending}>
                 {isSubmitting ? "Submitting..." : "Continue"}
               </Button>
             )}
           </form.Subscribe>
         </form>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pt-2">
           <div className="h-px flex-1 bg-border" />
-          <span className="text-xs text-muted-foreground">OR</span>
+          <span className="text-xs font-medium text-muted-foreground">OR</span>
           <div className="h-px flex-1 bg-border" />
         </div>
 
         <Button variant="outline" className="w-full" type="button">
-          <span
-            className="mr-2 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white text-lg font-semibold text-primary"
-            aria-hidden="true"
-          >
-            G
-          </span>
+          <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <text x="12" y="15" textAnchor="middle" fontSize="8" fontWeight="bold" fill="currentColor">
+              G
+            </text>
+          </svg>
           Continue with Google
         </Button>
 
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-xs text-muted-foreground text-center pt-2">
           By signing in, you agree to the Terms of Service and Privacy Policy.
         </p>
       </CardContent>
