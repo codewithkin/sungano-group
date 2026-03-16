@@ -5,13 +5,12 @@
 @source "../**/*.{ts,tsx}";
 
 :root {
-  --background: #eef1ef;
   --foreground: #111827;
   --card: #ffffff;
   --card-foreground: #111827;
   --popover: #ffffff;
   --popover-foreground: #111827;
-  --primary: #16a34a;
+  --primary: #6B2C5F;
   --primary-foreground: #ffffff;
   --secondary: #f1f5f2;
   --secondary-foreground: #1f2937;
@@ -22,8 +21,8 @@
   --destructive: #ef4444;
   --border: #dde3df;
   --input: #d7dfda;
-  --ring: #16a34a;
-  --chart-1: #16a34a;
+  --ring: #6B2C5F;
+  --chart-1: #6B2C5F;
   --chart-2: #22c55e;
   --chart-3: #84cc16;
   --chart-4: #14b8a6;
@@ -31,12 +30,12 @@
   --radius: 0.75rem;
   --sidebar: #f6faf7;
   --sidebar-foreground: #111827;
-  --sidebar-primary: #16a34a;
+  --sidebar-primary: #6B2C5F;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e8f7ee;
+  --sidebar-accent: #f3eff4;
   --sidebar-accent-foreground: #14532d;
   --sidebar-border: #dde3df;
-  --sidebar-ring: #16a34a;
+  --sidebar-ring: #6B2C5F;
 }
 
 @theme inline {
