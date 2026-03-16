@@ -16,7 +16,6 @@
     "@sungano-group/db": "workspace:*",
     "@sungano-group/env": "workspace:*",
     "@trpc/server": "catalog:",
-    "better-auth": "catalog:",
     "dotenv": "catalog:",
     "hono": "catalog:",
     "zod": "catalog:"
