@@ -80,7 +80,7 @@ export default function SignInForm() {
             <form.Field name="username">
               {(field) => (
                 <div className="space-y-1">
-                  <div className="flex items-center gap-3 rounded-[12px] border border-input bg-white px-4 py-3 shadow-[inset_0_1px_0_rgba(15,23,42,0.04)] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">
+                  <div className="flex items-center gap-3 rounded-2xl border border-input bg-white px-4 py-3 shadow-[inset_0_1px_0_rgba(15,23,42,0.04)] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">
                     <Mail className="h-4 w-4 text-muted-foreground" />
                     <Input
                       id={field.name}
@@ -131,7 +131,7 @@ export default function SignInForm() {
             selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}
           >
             {({ canSubmit, isSubmitting }) => (
-              <Button type="submit" className="w-full mt-6" disabled={!canSubmit || isSubmitting || isPending}>
+              <Button type="submit" className="mt-6" disabled={!canSubmit || isSubmitting || isPending}>
                 {isSubmitting ? "Submitting..." : "Continue"}
               </Button>
             )}
