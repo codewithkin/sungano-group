@@ -1,29 +1,6 @@
-- Plan out what each role should be able to access
+- Remove dark mode support
+- Attached to this message is a design for a sign in page, I want you to look at the design and take away design elements, layout, spacing, colors and use the design to construct a /apps/docs/DESIGN-SYSTEM.md file, no support for dark mode for now
+-- Install shadcn if not done already in the web app,and then install the shadcn components we'll ened, e.g sidebar, sheet, dialog, button, input, card and then edit them all to match the design design we created above
+-- Reconstruct EVERY web app page, one by ona,e to match the design system in etrm,s of typography, iconography, colors, layout, cleanliness
 
-(1) Inside the "web" app frontend, create a single reusable object called api, with members like get, post and patch
-
-This function uses axios under the hood for every request, and makes a request to process.env.NEXT_PUBLIC_SERVER_UR
-
-✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
-
-(2) For every request, make sure you're using tanstack react query, adding laoding logic using isLoasiding and error logic as well, for get requests, use queries, for post, delete, patch and put requests, use mutations
-
-✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
-
-(3) Instead of using better auth for authetication, delete better-auth entirely and instead use a custom auth implementation optimized for RBAC
-
-✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
-
-(4) Create 3 roles:
-i. admin
-ii. driver
-iii. manager
-iv. Staff
-
-- Create an admin-seed script using prisma that seeds the db with 1 admin user, username "admin", password 12345678 (thus is how users ligcn, using username + password)
-
-✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
-
-- For the root web page /, make it solely responsible for redirecting users based on auth state
-
-- Redircet to /sign-in if the useris not signed in, ldashbaord if signed in and so on
+For these tasks, create a list of todos and then make a commit for every todo
