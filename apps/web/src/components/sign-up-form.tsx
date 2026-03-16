@@ -3,53 +3,39 @@ import { Input } from "@sungano-group/ui/components/input";
 import { Label } from "@sungano-group/ui/components/label";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 
-import { authClient } from "@/lib/auth-client";
-
-import Loader from "./loader";
-
 export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => void }) {
   const router = useRouter();
-  const { isPending } = authClient.useSession();
+  const [isPending, setIsPending] = useState(false);
 
   const form = useForm({
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
       name: "",
     },
     onSubmit: async ({ value }) => {
-      await authClient.signUp.email(
-        {
-          email: value.email,
-          password: value.password,
-          name: value.name,
-        },
-        {
-          onSuccess: () => {
-            router.push("/dashboard");
-            toast.success("Sign up successful");
-          },
-          onError: (error) => {
-            toast.error(error.error.message || error.error.statusText);
-          },
-        },
-      );
+      setIsPending(true);
+      try {
+        toast.info("Sign up is not available. Please contact an administrator to create an account.");
+        router.push("/login");
+      } finally {
+        setIsPending(false);
+      }
     },
     validators: {
       onSubmit: z.object({
         name: z.string().min(2, "Name must be at least 2 characters"),
-        email: z.email("Invalid email address"),
+        username: z.string().min(3, "Username must be at least 3 characters"),
         password: z.string().min(8, "Password must be at least 8 characters"),
       }),
     },
   });
 
-  if (isPending) {
-    return <Loader />;
-  }
+  if (isPending) return null;
 
   return (
     <div className="mx-auto w-full mt-10 max-w-md p-6">
@@ -86,14 +72,14 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
         </div>
 
         <div>
-          <form.Field name="email">
+          <form.Field name="username">
             {(field) => (
               <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
+                <Label htmlFor={field.name}>Username</Label>
                 <Input
                   id={field.name}
                   name={field.name}
-                  type="email"
+                  type="text"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}

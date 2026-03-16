@@ -3,50 +3,45 @@ import { Input } from "@sungano-group/ui/components/input";
 import { Label } from "@sungano-group/ui/components/label";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 
-import { authClient } from "@/lib/auth-client";
+import { login } from "@/lib/auth-client";
 
 import Loader from "./loader";
 
 export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) {
   const router = useRouter();
-  const { isPending } = authClient.useSession();
+  const [isPending, setIsPending] = useState(false);
 
   const form = useForm({
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
     onSubmit: async ({ value }) => {
-      await authClient.signIn.email(
-        {
-          email: value.email,
-          password: value.password,
-        },
-        {
-          onSuccess: () => {
-            router.push("/dashboard");
-            toast.success("Sign in successful");
-          },
-          onError: (error) => {
-            toast.error(error.error.message || error.error.statusText);
-          },
-        },
-      );
+      setIsPending(true);
+      try {
+        await login({ username: value.username, password: value.password });
+        router.push("/dashboard");
+        toast.success("Sign in successful");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to sign in";
+        toast.error(message);
+      } finally {
+        setIsPending(false);
+      }
     },
     validators: {
       onSubmit: z.object({
-        email: z.email("Invalid email address"),
+        username: z.string().min(3, "Username is required"),
         password: z.string().min(8, "Password must be at least 8 characters"),
       }),
     },
   });
 
-  if (isPending) {
-    return <Loader />;
-  }
+  if (isPending) return <Loader />;
 
   return (
     <div className="mx-auto w-full mt-10 max-w-md p-6">
@@ -61,14 +56,14 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
         className="space-y-4"
       >
         <div>
-          <form.Field name="email">
+          <form.Field name="username">
             {(field) => (
               <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
+                <Label htmlFor={field.name}>Username</Label>
                 <Input
                   id={field.name}
                   name={field.name}
-                  type="email"
+                  type="text"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
