@@ -1,19 +1,26 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { env } from "@sungano-group/env/web";
+
 import DashboardOverview from "./dashboard";
 
 export default async function DashboardPage() {
-  const session = await authClient.getSession({
-    fetchOptions: {
-      headers: await headers(),
-      throw: true,
+  const res = await fetch(`${env.NEXT_PUBLIC_SERVER_URL}/api/auth/me`, {
+    method: "GET",
+    headers: {
+      cookie: (await headers()).get("cookie") ?? "",
     },
+    cache: "no-store",
   });
 
-  if (!session?.user) {
+  if (!res.ok) {
     redirect("/login");
   }
 
-  return <DashboardOverview session={session} />;
+  const data = (await res.json()) as { user: unknown };
+  if (!data?.user || typeof data.user !== "object") {
+    redirect("/login");
+  }
+
+  return <DashboardOverview session={data as { user: any }} />;
 }

@@ -11,8 +11,17 @@ import {
 } from "@sungano-group/ui/components/card";
 import { Badge } from "@sungano-group/ui/components/badge";
 import { Skeleton } from "@sungano-group/ui/components/skeleton";
-import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/utils/trpc";
+
+type UserSession = {
+  user: {
+    id: string;
+    username: string;
+    role: string;
+    name?: string | null;
+    email?: string | null;
+  };
+};
 
 function StatCard({
   title,
@@ -53,7 +62,7 @@ function StatCard({
 export default function DashboardOverview({
   session,
 }: {
-  session: typeof authClient.$Infer.Session;
+  session: UserSession;
 }) {
   const truckStats = useQuery(trpc.truck.stats.queryOptions());
   const trailerStats = useQuery(trpc.trailer.stats.queryOptions());
@@ -71,7 +80,7 @@ export default function DashboardOverview({
       {/* Welcome header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          Welcome back, {session.user.name}
+          Welcome back, {session.user.name ?? session.user.username}
         </h1>
         <p className="text-muted-foreground">
           Here&apos;s an overview of your fleet operations.
