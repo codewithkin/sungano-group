@@ -6,9 +6,13 @@ This function uses axios under the hood for every request, and makes a request t
 
 ✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
-(2) For every request, make sure you're using tanstack react query, adding laoding logic using isLoasiding and error logic as wlel, for get requests, use queries, for post, delete, patch and put requests, use mutations
+(2) For every request, make sure you're using tanstack react query, adding laoding logic using isLoasiding and error logic as well, for get requests, use queries, for post, delete, patch and put requests, use mutations
+
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 (3) Instead of using better auth for authetication, delete better-auth entirely and instead use a custom auth implementation optimized for RBAC
+
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 (4) Create 3 roles:
 i. admin
@@ -17,6 +21,8 @@ iii. manager
 iv. Staff
 
 - Create an admin-seed script using prisma that seeds the db with 1 admin user, username "admin", password 12345678 (thus is how users ligcn, using username + password)
+
+✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅
 
 - For the root web page /, make it solely responsible for redirecting users based on auth state
 
