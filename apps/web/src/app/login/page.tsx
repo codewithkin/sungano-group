@@ -1,13 +1,36 @@
-"use client";
+import { Input } from "@sungano-group/ui/components/input";
+import { Label } from "@sungano-group/ui/components/label";
+import Image from "next/image";
 
-import SignInForm from "@/components/sign-in-form";
-
-export default function LoginPage() {
+export default function Login () {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f6f8fb] via-[#edf2fb] to-[#dbe8ff] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-[440px] bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-[#e5e7eb] p-8 lg:p-10">
-        <SignInForm />
-      </div>
-    </div>
-  );
+    <section className="grid md:grod-cols-2">
+      {/* Actual login form */}
+      <article className="px-40 py-36">
+        {/* Welcome message and logo */}
+        <article className="flex flex-col gap-4 pb-4">
+          <Image
+          src="/logo.jpeg"
+          alt="Sungano Group Logo"
+          width={48}
+          height={48}
+          className="rounded-full"
+        />
+        <h1 className="text-xl font-medium">Welcome to Sungano Group</h1>
+        </article>
+
+        <article className="flex flex-col gap-2">
+          <Label htmlFor="username">Username</Label>
+          <Input
+            id="username"
+            name="username"
+            placeholder="Enter your username"
+          />
+        </article>
+      </article>
+
+      {/* White truck creative */}
+      <article></article>
+    </section>
+  )
 }
