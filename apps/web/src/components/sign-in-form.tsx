@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import z from "zod";
 
 import { login } from "@/lib/auth-client";
-
 import Loader from "./loader";
 
 export default function SignInForm() {
@@ -53,7 +52,7 @@ export default function SignInForm() {
 
   return (
     <Card className="shadow-none border-0 p-0">
-      <CardHeader className="px-0 pb-6 space-y-4">
+      <CardHeader className="px-0 pb-8 space-y-4">
         <div className="flex items-center justify-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent">
             <Mail className="h-5 w-5 text-primary" />
@@ -61,12 +60,13 @@ export default function SignInForm() {
         </div>
         <div className="space-y-2 text-center">
           <CardTitle className="text-2xl font-semibold">Sign in to Sungano</CardTitle>
-          <CardDescription className="text-sm text-muted-foreground">
+          <CardDescription className="text-sm">
             Access to this system is by invitation only.
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="px-0 space-y-5">
+
+      <CardContent className="px-0 space-y-6">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -76,25 +76,23 @@ export default function SignInForm() {
           className="space-y-4"
         >
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-sm font-medium text-foreground">Enter your username</Label>
+            <Label htmlFor="username" className="text-sm font-medium">
+              Enter your username
+            </Label>
             <form.Field name="username">
               {(field) => (
                 <div className="space-y-1">
-                  <div className="flex items-center gap-3 rounded-2xl border border-input bg-white px-4 py-3 shadow-[inset_0_1px_0_rgba(15,23,42,0.04)] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      type="text"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="your-username"
-                      className="border-0 px-0 py-0 shadow-none focus-visible:ring-0 focus-visible:border-none"
-                    />
-                  </div>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="text"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="username"
+                  />
                   {field.state.meta.errors.map((error) => (
-                    <p key={error?.message} className="text-sm text-destructive">
+                    <p key={error?.message} className="text-xs text-destructive">
                       {error?.message}
                     </p>
                   ))}
@@ -104,7 +102,9 @@ export default function SignInForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium text-foreground">Password</Label>
+            <Label htmlFor="password" className="text-sm font-medium">
+              Password
+            </Label>
             <form.Field name="password">
               {(field) => (
                 <div className="space-y-1">
@@ -115,10 +115,10 @@ export default function SignInForm() {
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Enter password"
+                    placeholder="••••••••"
                   />
                   {field.state.meta.errors.map((error) => (
-                    <p key={error?.message} className="text-sm text-destructive">
+                    <p key={error?.message} className="text-xs text-destructive">
                       {error?.message}
                     </p>
                   ))}
@@ -131,19 +131,41 @@ export default function SignInForm() {
             selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}
           >
             {({ canSubmit, isSubmitting }) => (
-              <Button type="submit" className="mt-6" disabled={!canSubmit || isSubmitting || isPending}>
-                {isSubmitting ? "Submitting..." : "Continue"}
+              <Button
+                type="submit"
+                className="w-full mt-2"
+                disabled={!canSubmit || isSubmitting || isPending}
+              >
+                {isSubmitting ? "Signing in..." : "Continue"}
               </Button>
             )}
           </form.Subscribe>
         </form>
 
-        <div className="space-y-1 pt-2 text-center">
-          <p className="text-xs text-muted-foreground">
-            By signing in, you agree to the Terms of Service and Privacy Policy.
+        <div className="flex flex-col items-center gap-4 pt-2">
+          <div className="flex items-center w-full gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs font-medium text-muted-foreground">OR</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <p className="text-xs text-center text-muted-foreground max-w-xs">
+            By signing in, you agree to the{" "}
+            <a href="#" className="text-primary underline hover:underline">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="#" className="text-primary underline hover:underline">
+              Privacy Policy
+            </a>
+            .
           </p>
-          <p className="text-xs text-muted-foreground">
-            Need help? <a className="text-primary font-semibold" href="#">Contact support</a>
+
+          <p className="text-xs text-center text-muted-foreground">
+            Need help?{" "}
+            <a href="#" className="text-primary font-semibold hover:underline">
+              Contact support
+            </a>
           </p>
         </div>
       </CardContent>
