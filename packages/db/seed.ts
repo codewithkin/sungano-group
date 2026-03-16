@@ -1,4 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
+import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 
 dotenv.config({ path: "../../apps/server/.env" });
@@ -28,6 +29,22 @@ async function main() {
   await prisma.trailer.deleteMany();
   await prisma.truck.deleteMany();
   await prisma.customer.deleteMany();
+  await prisma.user.deleteMany();
+
+  // --- ADMIN USER ---
+  const adminPasswordHash = await bcrypt.hash("12345678", 10);
+
+  const admin = await prisma.user.create({
+    data: {
+      username: "admin",
+      passwordHash: adminPasswordHash,
+      role: "ADMIN",
+      name: "System Administrator",
+      email: "admin@example.com",
+    },
+  });
+
+  console.log(`✅ Seeded admin user: ${admin.username}`);
 
   // --- TRUCKS ---
   const trucks = await Promise.all([

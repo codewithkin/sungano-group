@@ -21,6 +21,7 @@
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "catalog:",
     "@sungano-group/env": "workspace:*",
+    "bcryptjs": "^2.4.3",
     "dotenv": "catalog:",
     "pg": "^8.17.1",
     "zod": "catalog:"
