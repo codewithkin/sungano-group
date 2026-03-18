@@ -366,4 +366,4 @@ export const tripRouter = router({
       return prisma.trip.delete({ where: { id: input.id } });
     }),
 });
-
+
