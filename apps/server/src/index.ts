@@ -13,12 +13,12 @@ const app = new Hono();
 
 app.use(logger());
 app.use(
-  "/*",
   cors({
     origin: env.CORS_ORIGIN,
-    allowMethods: ["GET", "POST", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
+    exposeHeaders: ["Content-Length"],
   }),
 );
 
