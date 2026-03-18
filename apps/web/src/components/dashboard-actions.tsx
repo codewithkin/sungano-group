@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -650,23 +651,25 @@ export function DashboardActions() {
           Add new
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>Quick create</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => setDialog("driver")}>
-            <UserRound className="mr-2 size-4" /> Driver
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setDialog("truck")}>
-            <Truck className="mr-2 size-4" /> Truck
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setDialog("trailer")}>
-            <Package className="mr-2 size-4" /> Trailer
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setDialog("customer")}>
-            <Building2 className="mr-2 size-4" /> Customer
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setDialog("cost")}>
-            <DollarSign className="mr-2 size-4" /> Cost
-          </DropdownMenuItem>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Quick create</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => setDialog("driver")}>
+              <UserRound className="mr-2 size-4" /> Driver
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setDialog("truck")}>
+              <Truck className="mr-2 size-4" /> Truck
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setDialog("trailer")}>
+              <Package className="mr-2 size-4" /> Trailer
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setDialog("customer")}>
+              <Building2 className="mr-2 size-4" /> Customer
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setDialog("cost")}>
+              <DollarSign className="mr-2 size-4" /> Cost
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 
