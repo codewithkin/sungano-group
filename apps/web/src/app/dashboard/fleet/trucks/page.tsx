@@ -97,7 +97,7 @@ function AddTruckDialog({ children }: { children: React.ReactNode }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add New Truck</DialogTitle>
@@ -256,7 +256,7 @@ export default function TrucksPage() {
             className="pl-9"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? "all")}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
@@ -324,14 +324,14 @@ export default function TrucksPage() {
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger>
                           <Button variant="ghost" size="icon" className="size-8">
                             <MoreHorizontal className="size-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/fleet/trucks/${truck.id}`}>
+                          <DropdownMenuItem>
+                            <Link href={`/dashboard/fleet/trucks/${truck.id}`} className="flex w-full items-center">
                               <Eye className="mr-2 size-4" />
                               View Details
                             </Link>

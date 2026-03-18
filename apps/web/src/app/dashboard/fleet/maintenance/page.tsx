@@ -74,7 +74,7 @@ function ScheduleMaintenanceDialog({ children }: { children: React.ReactNode }) 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Schedule Maintenance</DialogTitle>
@@ -231,7 +231,7 @@ export default function MaintenancePage() {
 
         <TabsContent value="all">
           <div className="flex gap-3 mb-4">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? "all")}>
               <SelectTrigger className="w-[180px]"><SelectValue placeholder="All Statuses" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>

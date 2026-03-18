@@ -41,7 +41,9 @@ function formatMetric(value?: number | null, suffix = "%", decimals = 0) {
 }
 
 export default function DriverDashboard({ session }: { session: UserSession }) {
-  const { data, isLoading, error } = useQuery(trpc.driver.me.queryOptions());
+  const { data: rawData, isLoading, error } = useQuery(trpc.driver.me.queryOptions());
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = rawData as any;
 
   const latestScore = data?.performanceScores?.[0];
   const currentAssignment = data?.assignments?.[0];
@@ -171,7 +173,8 @@ export default function DriverDashboard({ session }: { session: UserSession }) {
                   </div>
                 ))
               ) : data?.trips?.length ? (
-                data.trips.map((trip) => (
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                data.trips.map((trip: any) => (
                   <div key={trip.id} className="flex items-center justify-between border rounded-md px-3 py-2">
                     <div>
                       <p className="font-medium">{trip.tripNumber}</p>
@@ -204,7 +207,8 @@ export default function DriverDashboard({ session }: { session: UserSession }) {
                   </div>
                 ))
               ) : data?.incidents?.length ? (
-                data.incidents.map((incident) => (
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                data.incidents.map((incident: any) => (
                   <div key={incident.id} className="flex items-center justify-between border rounded-md px-3 py-2">
                     <div>
                       <p className="font-medium">{incident.type}</p>

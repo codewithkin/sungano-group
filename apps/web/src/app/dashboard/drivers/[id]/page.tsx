@@ -34,9 +34,11 @@ export default function DriverDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { data: driver, isLoading } = useQuery(
+  const { data: rawDriver, isLoading } = useQuery(
     trpc.driver.byId.queryOptions({ id })
   );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const driver = rawDriver as any;
 
   if (isLoading) {
     return (
@@ -49,10 +51,10 @@ export default function DriverDetailPage({
 
   if (!driver) return null;
 
-  const currentAssignment = driver.assignments?.find((a) => a.isCurrent);
-  const initials = driver.user.name
+  const currentAssignment = driver.assignments?.find((a: any) => a.isCurrent);
+  const initials = (driver.user?.name ?? "")
     .split(" ")
-    .map((n) => n[0])
+    .map((n: any) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
@@ -61,11 +63,11 @@ export default function DriverDetailPage({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/dashboard/drivers">
+        <Link href="/dashboard/drivers">
+          <Button variant="ghost" size="icon">
             <ArrowLeft className="size-4" />
-          </Link>
-        </Button>
+          </Button>
+        </Link>
         <Avatar className="size-12">
           <AvatarFallback className="text-lg">{initials}</AvatarFallback>
         </Avatar>
@@ -208,7 +210,7 @@ export default function DriverDetailPage({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {driver.hoursLogs.map((log) => (
+                  {driver.hoursLogs.map((log: any) => (
                     <div key={log.id} className="flex items-center gap-4 p-3 rounded-lg border">
                       <div className="min-w-[80px] text-sm font-medium">
                         {new Date(log.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
@@ -257,7 +259,7 @@ export default function DriverDetailPage({
                       </TableCell>
                     </TableRow>
                   ) : (
-                    driver.trips.map((trip) => (
+                    driver.trips.map((trip: any) => (
                       <TableRow key={trip.id}>
                         <TableCell className="font-medium font-mono">{trip.tripNumber}</TableCell>
                         <TableCell>{trip.truck?.unitNumber ?? "—"}</TableCell>
@@ -298,7 +300,7 @@ export default function DriverDetailPage({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {driver.performanceScores.map((score) => (
+                    {driver.performanceScores.map((score: any) => (
                       <TableRow key={score.id}>
                         <TableCell>
                           {new Date(score.period).toLocaleDateString(undefined, { year: "numeric", month: "long" })}
@@ -339,7 +341,7 @@ export default function DriverDetailPage({
                       </TableCell>
                     </TableRow>
                   ) : (
-                    driver.assignments.map((a) => (
+                    driver.assignments.map((a: any) => (
                       <TableRow key={a.id}>
                         <TableCell className="font-medium">
                           {a.truck.unitNumber} — {a.truck.make} {a.truck.model}

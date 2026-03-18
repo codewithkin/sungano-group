@@ -559,7 +559,7 @@ function CreateTripDialog({ open, onClose }: DialogProps) {
                   <SelectValue placeholder={drivers.isLoading ? "Loading drivers..." : driverOptions.length ? "Select driver" : "No drivers"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {driverOptions.map((driver) => (
+                  {driverOptions.map((driver: any) => (
                     <SelectItem key={driver.id} value={driver.id}>
                       {driver.user?.name ?? "Unassigned"} • {driver.licenseNumber}
                     </SelectItem>
@@ -645,7 +645,7 @@ export function DashboardActions() {
   return (
     <div className="flex items-center gap-2">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger>
           <Button variant="outline" size="sm" className="gap-2">
             <Plus className="size-4" />
             Add new

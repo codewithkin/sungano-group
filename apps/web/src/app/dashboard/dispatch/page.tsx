@@ -62,7 +62,7 @@ function CreateTripDialog({ children }: { children: React.ReactNode }) {
   const [selectedShipments, setSelectedShipments] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
-  const drivers = useQuery(trpc.driver.list.queryOptions({ status: "ACTIVE" }));
+  const drivers = useQuery(trpc.driver.list.queryOptions({ status: "AVAILABLE", limit: 100 }));
   const trucks = useQuery(trpc.truck.list.queryOptions({ status: "AVAILABLE", limit: 100 }));
   const trailers = useQuery(trpc.trailer.list.queryOptions({ status: "AVAILABLE", limit: 100 }));
   const unassigned = useQuery(trpc.shipment.unassigned.queryOptions());
@@ -106,7 +106,7 @@ function CreateTripDialog({ children }: { children: React.ReactNode }) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setSelectedShipments([]); }}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Trip</DialogTitle>
@@ -121,7 +121,7 @@ function CreateTripDialog({ children }: { children: React.ReactNode }) {
                 <SelectTrigger><SelectValue placeholder="Select driver" /></SelectTrigger>
                 <SelectContent>
                   {drivers.data?.items.map((d) => (
-                    <SelectItem key={d.id} value={d.id}>{d.user.name} — {d.licenseNumber}</SelectItem>
+                    <SelectItem key={d.id} value={d.id}>{(d as any).user?.name ?? d.licenseNumber} — {d.licenseNumber}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -254,11 +254,12 @@ function TripDetailSheet({ tripId, children }: { tripId: string; children: React
     onError: (err) => toast.error(err.message),
   });
 
-  const t = trip.data;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const t = trip.data as any;
 
   return (
     <Sheet>
-      <SheetTrigger asChild>{children}</SheetTrigger>
+      <SheetTrigger>{children}</SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{t?.tripNumber ?? "Loading..."}</SheetTitle>
@@ -356,7 +357,7 @@ function TripDetailSheet({ tripId, children }: { tripId: string; children: React
                 <p className="text-sm text-muted-foreground">No shipments assigned</p>
               ) : (
                 <div className="space-y-2">
-                  {t.shipments.map((s) => (
+                  {t.shipments.map((s: any) => (
                     <Card key={s.id} className="p-3">
                       <div className="flex items-center justify-between">
                         <div>
@@ -386,7 +387,7 @@ function TripDetailSheet({ tripId, children }: { tripId: string; children: React
                     Stops ({t.stops.length})
                   </p>
                   <div className="space-y-2">
-                    {t.stops.map((stop, i) => (
+                    {t.stops.map((stop: any, i: number) => (
                       <div key={stop.id} className="flex items-start gap-3 text-sm">
                         <div className="flex flex-col items-center">
                           <div className="size-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">
@@ -554,7 +555,7 @@ export default function DispatchPage() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? "all")}>
                 <SelectTrigger className="w-[160px]"><SelectValue placeholder="All" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
@@ -596,7 +597,7 @@ export default function DispatchPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  trips.data?.items.map((trip) => (
+                  trips.data?.items.map((trip: any) => (
                     <TripDetailSheet key={trip.id} tripId={trip.id}>
                       <TableRow className="cursor-pointer hover:bg-muted/50">
                         <TableCell className="font-medium">{trip.tripNumber}</TableCell>

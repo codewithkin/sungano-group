@@ -16,7 +16,6 @@ import { Skeleton } from "@sungano-group/ui/components/skeleton";
 import {
   ChartContainer,
   ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@sungano-group/ui/components/chart";
@@ -276,7 +275,7 @@ export default function DashboardOverview({
                       <Area type="monotone" dataKey="trucks" stroke="var(--color-trucks)" fill="var(--color-trucks)" fillOpacity={0.15} strokeWidth={2} />
                       <Area type="monotone" dataKey="drivers" stroke="var(--color-drivers)" fill="var(--color-drivers)" fillOpacity={0.15} strokeWidth={2} />
                       <Area type="monotone" dataKey="incidents" stroke="var(--color-incidents)" fill="var(--color-incidents)" fillOpacity={0.12} strokeWidth={2} />
-                      <ChartLegend verticalAlign="bottom" content={<ChartLegendContent />} />
+                      <ChartLegend verticalAlign="bottom" />
                     </AreaChart>
                   </ChartContainer>
                 </CardContent>

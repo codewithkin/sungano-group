@@ -1,33 +1,37 @@
-import axios, { AxiosRequestConfig } from "axios";
-
 const baseURL = process.env.NEXT_PUBLIC_SERVER_URL ?? "";
 
-const client = axios.create({
-  baseURL,
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-function get<T = unknown>(url: string, config?: AxiosRequestConfig) {
-  return client.get<T>(url, config).then((res) => res.data);
+async function request<T = unknown>(method: string, url: string, body?: unknown): Promise<T> {
+  const res = await fetch(`${baseURL}${url}`, {
+    method,
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(text || `Request failed: ${res.status}`);
+  }
+  return res.json() as Promise<T>;
 }
 
-function post<T = unknown, B = unknown>(url: string, body?: B, config?: AxiosRequestConfig) {
-  return client.post<T>(url, body, config).then((res) => res.data);
+function get<T = unknown>(url: string) {
+  return request<T>("GET", url);
 }
 
-function patch<T = unknown, B = unknown>(url: string, body?: B, config?: AxiosRequestConfig) {
-  return client.patch<T>(url, body, config).then((res) => res.data);
+function post<T = unknown, B = unknown>(url: string, body?: B) {
+  return request<T>("POST", url, body);
 }
 
-function put<T = unknown, B = unknown>(url: string, body?: B, config?: AxiosRequestConfig) {
-  return client.put<T>(url, body, config).then((res) => res.data);
+function patch<T = unknown, B = unknown>(url: string, body?: B) {
+  return request<T>("PATCH", url, body);
 }
 
-function del<T = unknown>(url: string, config?: AxiosRequestConfig) {
-  return client.delete<T>(url, config).then((res) => res.data);
+function put<T = unknown, B = unknown>(url: string, body?: B) {
+  return request<T>("PUT", url, body);
+}
+
+function del<T = unknown>(url: string) {
+  return request<T>("DELETE", url);
 }
 
 export const api = { get, post, patch, put, del };

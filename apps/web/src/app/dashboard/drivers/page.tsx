@@ -121,7 +121,7 @@ export default function DriversPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input placeholder="Search drivers..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? "all")}>
           <SelectTrigger className="w-[180px]"><SelectValue placeholder="All Statuses" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
@@ -165,7 +165,7 @@ export default function DriversPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                data?.items.map((driver) => (
+                data?.items.map((driver: any) => (
                   <TableRow key={driver.id}>
                     <TableCell>
                       <div>
@@ -202,14 +202,14 @@ export default function DriversPage() {
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger>
                           <Button variant="ghost" size="icon" className="size-8">
                             <MoreHorizontal className="size-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/drivers/${driver.id}`}>
+                          <DropdownMenuItem>
+                            <Link href={`/dashboard/drivers/${driver.id}`} className="flex w-full items-center">
                               <Eye className="mr-2 size-4" />View Profile
                             </Link>
                           </DropdownMenuItem>

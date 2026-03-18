@@ -88,11 +88,11 @@ export default function TruckDetailPage({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/dashboard/fleet/trucks">
+        <Link href="/dashboard/fleet/trucks">
+          <Button variant="ghost" size="icon">
             <ArrowLeft className="size-4" />
-          </Link>
-        </Button>
+          </Button>
+        </Link>
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight">

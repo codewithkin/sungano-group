@@ -58,7 +58,7 @@ function AddCustomerDialog({ children }: { children: React.ReactNode }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add Customer</DialogTitle>
@@ -237,12 +237,12 @@ export default function CustomersPage() {
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger>
                           <Button variant="ghost" size="sm">⋯</Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/customers/${c.id}`}>View Details</Link>
+                          <DropdownMenuItem>
+                            <Link href={`/dashboard/customers/${c.id}`} className="w-full">View Details</Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-destructive"

@@ -77,7 +77,7 @@ export const analyticsRouter = router({
       prisma.trip.count({ where: { status: "COMPLETED", createdAt: { gte: thirtyDaysAgo } } }),
       prisma.shipment.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
       prisma.shipment.count({ where: { status: "DELIVERED", createdAt: { gte: thirtyDaysAgo } } }),
-      prisma.driver.count({ where: { status: "ACTIVE" } }),
+      prisma.driver.count({ where: { status: "ON_TRIP" } }),
       prisma.truck.count({ where: { status: "AVAILABLE" } }),
       prisma.incident.count({ where: { resolvedAt: null } }),
     ]);

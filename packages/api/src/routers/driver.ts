@@ -31,7 +31,7 @@ export const driverRouter = router({
         ...(cursor && { cursor: { id: cursor }, skip: 1 }),
         orderBy: { createdAt: "desc" },
         include: {
-          user: { select: { id: true, name: true, email: true, image: true } },
+          user: { select: { id: true, name: true, email: true } },
           assignments: {
             where: { isCurrent: true },
             include: { truck: { select: { id: true, unitNumber: true, make: true, model: true } } },
@@ -52,7 +52,7 @@ export const driverRouter = router({
     return prisma.driver.findUniqueOrThrow({
       where: { userId: ctx.session.user.id },
       include: {
-        user: { select: { id: true, name: true, email: true, image: true } },
+        user: { select: { id: true, name: true, email: true } },
         assignments: {
           orderBy: { startDate: "desc" },
           include: { truck: { select: { id: true, unitNumber: true, make: true, model: true } } },
@@ -75,7 +75,7 @@ export const driverRouter = router({
       return prisma.driver.findUniqueOrThrow({
         where: { id: input.id },
         include: {
-          user: { select: { id: true, name: true, email: true, image: true } },
+          user: { select: { id: true, name: true, email: true } },
           assignments: {
             orderBy: { startDate: "desc" },
             include: { truck: { select: { id: true, unitNumber: true, make: true, model: true } } },

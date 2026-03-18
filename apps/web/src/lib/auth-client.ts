@@ -46,9 +46,17 @@ export function logout() {
   }).then((res) => handleResponse<{ message: string }>(res));
 }
 
+export interface AuthUser {
+  id: string;
+  name?: string;
+  username?: string;
+  email?: string;
+  role?: string;
+}
+
 export function getCurrentUser() {
   return fetch(`${baseURL}/api/auth/me`, {
     method: "GET",
     credentials: "include",
-  }).then((res) => handleResponse<{ user: unknown; token?: string }>(res));
+  }).then((res) => handleResponse<{ user: AuthUser; token?: string }>(res));
 }

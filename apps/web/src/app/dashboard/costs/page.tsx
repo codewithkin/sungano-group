@@ -76,7 +76,7 @@ function AddExpenseDialog({ children }: { children: React.ReactNode }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Record Expense</DialogTitle>
@@ -156,7 +156,7 @@ function AddFuelLogDialog({ children }: { children: React.ReactNode }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Log Fuel</DialogTitle>
@@ -303,7 +303,10 @@ export default function CostDashboardPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="month" className="text-xs" />
                   <YAxis className="text-xs" tickFormatter={(v: number) => `R${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(value: number) => `R ${value.toLocaleString()}`} />
+                  <Tooltip formatter={(value) => {
+                    if (typeof value === 'number') return `R ${value.toLocaleString()}`;
+                    return value;
+                  }} />
                   <Legend />
                   <Bar dataKey="fuel" stackId="a" fill="#2563eb" name="Fuel" />
                   <Bar dataKey="expenses" stackId="a" fill="#d97706" name="Expenses" />
@@ -333,13 +336,16 @@ export default function CostDashboardPage() {
                     cy="50%"
                     outerRadius={100}
                     dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
                   >
                     {pieData.map((_, i) => (
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => `R ${value.toLocaleString()}`} />
+                  <Tooltip formatter={(value) => {
+                    if (typeof value === 'number') return `R ${value.toLocaleString()}`;
+                    return value;
+                  }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -356,7 +362,7 @@ export default function CostDashboardPage() {
 
         <TabsContent value="expenses">
           <div className="flex gap-3 mb-4">
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v ?? "all")}>
               <SelectTrigger className="w-[180px]"><SelectValue placeholder="All Categories" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>

@@ -77,7 +77,7 @@ function ReportIncidentDialog({ children }: { children: React.ReactNode }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Report Incident</DialogTitle>
@@ -123,7 +123,7 @@ function ReportIncidentDialog({ children }: { children: React.ReactNode }) {
                 <SelectContent>
                   <SelectItem value="none">None</SelectItem>
                   {drivers.data?.items.map((d) => (
-                    <SelectItem key={d.id} value={d.id}>{d.user.name}</SelectItem>
+                    <SelectItem key={d.id} value={d.id}>{(d as any).user?.name ?? d.licenseNumber}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -175,7 +175,7 @@ function ResolveSheet({ incidentId, children }: { incidentId: string; children: 
 
   return (
     <Sheet>
-      <SheetTrigger asChild>{children}</SheetTrigger>
+      <SheetTrigger>{children}</SheetTrigger>
       <SheetContent className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Incident Details</SheetTitle>
@@ -334,7 +334,7 @@ export default function IncidentsPage() {
 
       {/* Filters */}
       <div className="flex gap-3">
-        <Select value={severityFilter} onValueChange={setSeverityFilter}>
+        <Select value={severityFilter} onValueChange={(v) => setSeverityFilter(v ?? "all")}>
           <SelectTrigger className="w-[160px]"><SelectValue placeholder="All Severities" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Severities</SelectItem>
@@ -344,7 +344,7 @@ export default function IncidentsPage() {
             <SelectItem value="CRITICAL">Critical</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={resolvedFilter} onValueChange={setResolvedFilter}>
+        <Select value={resolvedFilter} onValueChange={(v) => setResolvedFilter(v ?? "all")}>
           <SelectTrigger className="w-[160px]"><SelectValue placeholder="All Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All</SelectItem>
