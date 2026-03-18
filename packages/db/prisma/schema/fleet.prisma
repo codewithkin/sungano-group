@@ -59,6 +59,7 @@ model Truck {
   fuelLogs            FuelLog[]
   documents           FleetDocument[]
   incidents           Incident[]
+  notifications       Notification[]
 
   @@map("truck")
 }

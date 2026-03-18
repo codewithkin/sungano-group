@@ -1,6 +1,7 @@
 import { z } from "zod";
 import prisma from "@sungano-group/db";
 import { router, dispatcherProcedure, managerProcedure, protectedProcedure } from "../index";
+import { createNotification } from "./notification";
 
 function generateTripNumber() {
   const ts = Date.now().toString(36).toUpperCase();
@@ -125,6 +126,7 @@ export const tripRouter = router({
             },
           }),
         },
+        include: { driver: { include: { user: { select: { name: true } } } }, truck: true },
       });
 
       // Assign shipments to this trip
@@ -135,6 +137,14 @@ export const tripRouter = router({
         });
       }
 
+      await createNotification({
+        message: `Trip ${trip.tripNumber} created for driver ${trip.driver.user.name} with truck ${trip.truck.unitNumber}.`,
+        type: "TRIP_CREATED",
+        driverId: trip.driverId,
+        truckId: trip.truckId,
+        tripId: trip.id,
+      });
+
       return trip;
     }),
 
@@ -142,20 +152,51 @@ export const tripRouter = router({
   dispatch: dispatcherProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input }) => {
-      return prisma.trip.update({
+      const trip = await prisma.trip.findUniqueOrThrow({
         where: { id: input.id },
-        data: { status: "DISPATCHED" },
+        include: { driver: { include: { user: { select: { name: true } } } }, truck: true, trailer: true },
       });
+
+      await Promise.all([
+        prisma.trip.update({ where: { id: input.id }, data: { status: "DISPATCHED" } }),
+        prisma.truck.update({ where: { id: trip.truckId }, data: { status: "IN_TRANSIT" } }),
+        prisma.driver.update({ where: { id: trip.driverId }, data: { status: "ON_TRIP" } }),
+        ...(trip.trailerId
+          ? [prisma.trailer.update({ where: { id: trip.trailerId }, data: { status: "IN_TRANSIT" } })]
+          : []),
+        createNotification({
+          message: `Trip ${trip.tripNumber} dispatched — driver ${trip.driver.user.name}, truck ${trip.truck.unitNumber}.`,
+          type: "TRIP_DISPATCHED",
+          driverId: trip.driverId,
+          truckId: trip.truckId,
+          tripId: trip.id,
+        }),
+      ]);
+
+      return prisma.trip.findUniqueOrThrow({ where: { id: input.id } });
     }),
 
   /** Start trip (driver begins driving) */
   start: dispatcherProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input }) => {
-      return prisma.trip.update({
+      const trip = await prisma.trip.findUniqueOrThrow({
         where: { id: input.id },
-        data: { status: "IN_PROGRESS", actualStartTime: new Date() },
+        include: { driver: { include: { user: { select: { name: true } } } }, truck: true },
       });
+
+      await Promise.all([
+        prisma.trip.update({ where: { id: input.id }, data: { status: "IN_PROGRESS", actualStartTime: new Date() } }),
+        createNotification({
+          message: `Trip ${trip.tripNumber} is now in progress — driver ${trip.driver.user.name} is on the road.`,
+          type: "TRIP_STARTED",
+          driverId: trip.driverId,
+          truckId: trip.truckId,
+          tripId: trip.id,
+        }),
+      ]);
+
+      return prisma.trip.findUniqueOrThrow({ where: { id: input.id } });
     }),
 
   /** Complete a trip */
@@ -167,29 +208,68 @@ export const tripRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      return prisma.trip.update({
+      const trip = await prisma.trip.findUniqueOrThrow({
         where: { id: input.id },
-        data: {
-          status: "COMPLETED",
-          endTime: new Date(),
-          ...(input.actualDistanceKm && { actualDistanceKm: input.actualDistanceKm }),
-        },
+        include: { driver: { include: { user: { select: { name: true } } } }, truck: true, trailer: true },
       });
+
+      await Promise.all([
+        prisma.trip.update({
+          where: { id: input.id },
+          data: {
+            status: "COMPLETED",
+            endTime: new Date(),
+            ...(input.actualDistanceKm && { actualDistanceKm: input.actualDistanceKm }),
+          },
+        }),
+        prisma.truck.update({ where: { id: trip.truckId }, data: { status: "AVAILABLE" } }),
+        prisma.driver.update({ where: { id: trip.driverId }, data: { status: "AVAILABLE" } }),
+        ...(trip.trailerId
+          ? [prisma.trailer.update({ where: { id: trip.trailerId }, data: { status: "AVAILABLE" } })]
+          : []),
+        createNotification({
+          message: `Trip ${trip.tripNumber} completed — driver ${trip.driver.user.name}, truck ${trip.truck.unitNumber} is now available.`,
+          type: "TRIP_FINISHED",
+          driverId: trip.driverId,
+          truckId: trip.truckId,
+          tripId: trip.id,
+        }),
+      ]);
+
+      return prisma.trip.findUniqueOrThrow({ where: { id: input.id } });
     }),
 
   /** Cancel a trip */
   cancel: managerProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input }) => {
-      // Unassign shipments
+      const trip = await prisma.trip.findUniqueOrThrow({
+        where: { id: input.id },
+        include: { driver: { include: { user: { select: { name: true } } } }, truck: true, trailer: true },
+      });
+
       await prisma.shipment.updateMany({
         where: { tripId: input.id },
         data: { tripId: null, status: "PENDING" },
       });
-      return prisma.trip.update({
-        where: { id: input.id },
-        data: { status: "CANCELLED" },
-      });
+
+      await Promise.all([
+        prisma.trip.update({ where: { id: input.id }, data: { status: "CANCELLED" } }),
+        prisma.truck.update({ where: { id: trip.truckId }, data: { status: "AVAILABLE" } }),
+        prisma.driver.update({ where: { id: trip.driverId }, data: { status: "AVAILABLE" } }),
+        ...(trip.trailerId
+          ? [prisma.trailer.update({ where: { id: trip.trailerId }, data: { status: "AVAILABLE" } })]
+          : []),
+        createNotification({
+          message: `Trip ${trip.tripNumber} was cancelled — driver ${trip.driver.user.name} and truck ${trip.truck.unitNumber} are now available.`,
+          type: "TRIP_CANCELLED",
+          driverId: trip.driverId,
+          truckId: trip.truckId,
+          tripId: trip.id,
+        }),
+      ]);
+
+      return prisma.trip.findUniqueOrThrow({ where: { id: input.id } });
     }),
 
   /** Mark trip as finished with actual end time */
@@ -197,26 +277,45 @@ export const tripRouter = router({
     .input(
       z.object({
         id: z.string(),
-        endTime: z.string().optional(), // ISO string; if not provided, uses now
+        endTime: z.string().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const trip = await prisma.trip.findUniqueOrThrow({ where: { id: input.id } });
-      
-      // Allow driver of this trip or manager to finish
-      const isDriver = ctx.session.user.role === "DRIVER" && trip.driverId === (await prisma.driver.findFirst({ where: { userId: ctx.session.user.id } }))?.id;
+      const trip = await prisma.trip.findUniqueOrThrow({
+        where: { id: input.id },
+        include: { driver: { include: { user: { select: { name: true } } } }, truck: true, trailer: true },
+      });
+
+      const isDriver = ctx.session.user.role === "DRIVER" &&
+        trip.driverId === (await prisma.driver.findFirst({ where: { userId: ctx.session.user.id } }))?.id;
       const isManager = ctx.session.user.role === "MANAGER";
       if (!isDriver && !isManager) {
         throw new Error("Only the assigned driver or a manager can finish a trip");
       }
 
-      return prisma.trip.update({
-        where: { id: input.id },
-        data: {
-          status: "COMPLETED",
-          endTime: input.endTime ? new Date(input.endTime) : new Date(),
-        },
-      });
+      await Promise.all([
+        prisma.trip.update({
+          where: { id: input.id },
+          data: {
+            status: "COMPLETED",
+            endTime: input.endTime ? new Date(input.endTime) : new Date(),
+          },
+        }),
+        prisma.truck.update({ where: { id: trip.truckId }, data: { status: "AVAILABLE" } }),
+        prisma.driver.update({ where: { id: trip.driverId }, data: { status: "AVAILABLE" } }),
+        ...(trip.trailerId
+          ? [prisma.trailer.update({ where: { id: trip.trailerId }, data: { status: "AVAILABLE" } })]
+          : []),
+        createNotification({
+          message: `Trip ${trip.tripNumber} finished — driver ${trip.driver.user.name} and truck ${trip.truck.unitNumber} are now available.`,
+          type: "TRIP_FINISHED",
+          driverId: trip.driverId,
+          truckId: trip.truckId,
+          tripId: trip.id,
+        }),
+      ]);
+
+      return prisma.trip.findUniqueOrThrow({ where: { id: input.id } });
     }),
 
   /** Update stop status */
@@ -249,11 +348,22 @@ export const tripRouter = router({
   delete: dispatcherProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input }) => {
-      // Unassign shipments first
+      const trip = await prisma.trip.findUniqueOrThrow({
+        where: { id: input.id },
+        select: { truckId: true, driverId: true, trailerId: true },
+      });
       await prisma.shipment.updateMany({
         where: { tripId: input.id },
         data: { tripId: null, status: "PENDING" },
       });
+      await Promise.all([
+        prisma.truck.update({ where: { id: trip.truckId }, data: { status: "AVAILABLE" } }),
+        prisma.driver.update({ where: { id: trip.driverId }, data: { status: "AVAILABLE" } }),
+        ...(trip.trailerId
+          ? [prisma.trailer.update({ where: { id: trip.trailerId }, data: { status: "AVAILABLE" } })]
+          : []),
+      ]);
       return prisma.trip.delete({ where: { id: input.id } });
     }),
 });
+

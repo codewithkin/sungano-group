@@ -111,6 +111,7 @@ model Trip {
   fuelLogs          FuelLog[]
   expenses          Expense[]
   statusUpdates     StatusUpdate[]
+  notifications     Notification[]
 
   @@index([driverId])
   @@index([truckId])

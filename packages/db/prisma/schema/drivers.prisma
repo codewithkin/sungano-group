@@ -26,6 +26,7 @@ model Driver {
   hoursLogs          HoursOfServiceLog[]
   incidents          Incident[]
   performanceScores  PerformanceScore[]
+  notifications      Notification[]
 
   @@map("driver")
 }

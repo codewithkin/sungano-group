@@ -10,6 +10,7 @@ import {
 } from "@sungano-group/ui/components/breadcrumb";
 import { AppSidebar } from "@/components/app-sidebar";
 import { DashboardActions } from "@/components/dashboard-actions";
+import { NotificationsDrawer } from "@/components/notifications-drawer";
 
 export default async function DashboardLayout({
   children,
@@ -37,6 +38,7 @@ export default async function DashboardLayout({
               </Breadcrumb>
             </div>
             <div className="flex flex-1 items-center justify-end gap-2">
+              <NotificationsDrawer />
               <DashboardActions />
             </div>
           </header>
