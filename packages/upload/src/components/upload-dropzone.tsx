@@ -101,9 +101,10 @@ export function UploadDropzone({
           };
           xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) resolve();
-            else reject(new Error(`Upload failed: ${xhr.status}`));
+            else reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`));
           };
-          xhr.onerror = () => reject(new Error("Network error during upload"));
+          xhr.onerror = () => reject(new Error("Network error during upload. Check CORS settings or try again."));
+          xhr.onabort = () => reject(new Error("Upload was aborted"));
           xhr.send(file);
         });
 
