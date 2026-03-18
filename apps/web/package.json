@@ -13,6 +13,7 @@
     "@sungano-group/auth": "workspace:*",
     "@sungano-group/env": "workspace:*",
     "@sungano-group/ui": "workspace:*",
+    "@sungano-group/upload": "workspace:*",
     "@tanstack/react-form": "^1.28.0",
     "@tanstack/react-query": "^5.90.12",
     "@trpc/client": "catalog:",

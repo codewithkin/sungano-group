@@ -97,9 +97,9 @@ model Trip {
   trailer           Trailer?    @relation(fields: [trailerId], references: [id])
   status            TripStatus  @default(PLANNED)
   plannedStartTime  DateTime
-  plannedEndTime    DateTime
+  projectedEndTime  DateTime    // Estimated end time set during planning
   actualStartTime   DateTime?
-  actualEndTime     DateTime?
+  endTime           DateTime?   // Actual end time set when trip is marked finished
   plannedDistanceKm Float?
   actualDistanceKm  Float?
   notes             String?

@@ -4,6 +4,7 @@ import { appRouter } from "@sungano-group/api/routers/index";
 import { JWT_COOKIE, authenticate, signAuthToken, verifyPassword } from "@sungano-group/auth";
 import { env } from "@sungano-group/env/server";
 import prisma from "@sungano-group/db";
+import { createPresignedUploadUrl, isAllowedMimeType } from "@sungano-group/upload/server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -61,6 +62,41 @@ app.post("/api/auth/login", async (c) => {
 app.post("/api/auth/logout", (c) => {
   deleteCookie(c, JWT_COOKIE, { path: "/" });
   return c.json({ message: "Logged out" });
+});
+
+app.post("/api/upload/presign", async (c) => {
+  const authResult = await authenticate(c.req.raw.headers);
+  if (!authResult) return c.json({ message: "Unauthorized" }, 401);
+
+  const body = await c.req.json().catch(() => null);
+  const filename = body?.filename as string | undefined;
+  const mimeType = body?.mimeType as string | undefined;
+  const folder = (body?.folder as string | undefined) ?? "uploads";
+
+  if (!filename || !mimeType) {
+    return c.json({ message: "filename and mimeType are required" }, 400);
+  }
+  if (!isAllowedMimeType(mimeType)) {
+    return c.json({ message: `File type "${mimeType}" is not allowed.` }, 400);
+  }
+
+  try {
+    const result = await createPresignedUploadUrl(
+      {
+        accountId: env.R2_ACCOUNT_ID,
+        accessKeyId: env.R2_ACCESS_KEY_ID,
+        secretAccessKey: env.R2_SECRET_ACCESS_KEY,
+        bucketName: env.R2_BUCKET_NAME,
+        publicUrl: env.R2_PUBLIC_URL,
+      },
+      filename,
+      mimeType,
+      folder,
+    );
+    return c.json(result);
+  } catch (err) {
+    return c.json({ message: err instanceof Error ? err.message : "Presign failed" }, 500);
+  }
 });
 
 app.get("/api/auth/me", async (c) => {

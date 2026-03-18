@@ -68,19 +68,22 @@ export const truckRouter = router({
   create: dispatcherProcedure
     .input(
       z.object({
-        unitNumber: z.string().min(1),
-        vin: z.string().min(1),
         make: z.string().min(1),
         model: z.string().min(1),
         year: z.number().int().min(1900).max(2030),
         licensePlate: z.string().min(1),
-        fuelType: z.enum(["DIESEL", "PETROL", "LNG", "ELECTRIC"]).default("DIESEL"),
-        tankCapacityLitres: z.number().positive(),
+        fuelType: z.enum(["DIESEL", "PETROL", "LNG"]).default("DIESEL"),
         mileage: z.number().int().min(0).default(0),
       })
     )
     .mutation(async ({ input }) => {
-      return prisma.truck.create({ data: input });
+      const count = await prisma.truck.count();
+      const unitNumber = `TRK-${String(count + 1).padStart(3, "0")}`;
+      const vin = `AUTO-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+      return prisma.truck.create({
+        data: { ...input, unitNumber, vin, tankCapacityLitres: 0 },
+        select: { id: true, unitNumber: true, make: true, model: true, year: true, licensePlate: true },
+      });
     }),
 
   update: dispatcherProcedure

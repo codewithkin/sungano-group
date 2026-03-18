@@ -5,7 +5,9 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@sungano-group/upload/server": ["../../packages/upload/src/server.ts"],
+      "@sungano-group/upload/constants": ["../../packages/upload/src/constants.ts"]
     },
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"

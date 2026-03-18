@@ -15,6 +15,7 @@
     "@sungano-group/auth": "workspace:*",
     "@sungano-group/db": "workspace:*",
     "@sungano-group/env": "workspace:*",
+    "@sungano-group/upload": "workspace:*",
     "@trpc/server": "catalog:",
     "dotenv": "catalog:",
     "hono": "catalog:",

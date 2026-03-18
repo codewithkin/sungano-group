@@ -87,7 +87,7 @@ export const tripRouter = router({
         truckId: z.string(),
         trailerId: z.string().optional(),
         plannedStartTime: z.string(),
-        plannedEndTime: z.string(),
+        projectedEndTime: z.string(),
         plannedDistanceKm: z.number().optional(),
         notes: z.string().optional(),
         shipmentIds: z.array(z.string()).optional(),
@@ -114,7 +114,7 @@ export const tripRouter = router({
           ...tripData,
           tripNumber: generateTripNumber(),
           plannedStartTime: new Date(tripData.plannedStartTime),
-          plannedEndTime: new Date(tripData.plannedEndTime),
+          projectedEndTime: new Date(tripData.projectedEndTime),
           ...(stops && {
             stops: {
               create: stops.map((s) => ({
@@ -171,7 +171,7 @@ export const tripRouter = router({
         where: { id: input.id },
         data: {
           status: "COMPLETED",
-          actualEndTime: new Date(),
+          endTime: new Date(),
           ...(input.actualDistanceKm && { actualDistanceKm: input.actualDistanceKm }),
         },
       });
@@ -189,6 +189,33 @@ export const tripRouter = router({
       return prisma.trip.update({
         where: { id: input.id },
         data: { status: "CANCELLED" },
+      });
+    }),
+
+  /** Mark trip as finished with actual end time */
+  finishTrip: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        endTime: z.string().optional(), // ISO string; if not provided, uses now
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const trip = await prisma.trip.findUniqueOrThrow({ where: { id: input.id } });
+      
+      // Allow driver of this trip or manager to finish
+      const isDriver = ctx.session.user.role === "DRIVER" && trip.driverId === (await prisma.driver.findFirst({ where: { userId: ctx.session.user.id } }))?.id;
+      const isManager = ctx.session.user.role === "MANAGER";
+      if (!isDriver && !isManager) {
+        throw new Error("Only the assigned driver or a manager can finish a trip");
+      }
+
+      return prisma.trip.update({
+        where: { id: input.id },
+        data: {
+          status: "COMPLETED",
+          endTime: input.endTime ? new Date(input.endTime) : new Date(),
+        },
       });
     }),
 

@@ -30,6 +30,12 @@
       ],
       "@sungano-group/ui/*": [
         "../../packages/ui/src/*"
+      ],
+      "@sungano-group/upload/constants": [
+        "../../packages/upload/src/constants.ts"
+      ],
+      "@sungano-group/upload/components/*": [
+        "../../packages/upload/src/components/*.tsx"
       ]
     }
   },

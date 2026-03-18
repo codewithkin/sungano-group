@@ -267,7 +267,7 @@ export default function DriverDetailPage({
                           <Badge variant="outline">{trip.status}</Badge>
                         </TableCell>
                         <TableCell>{new Date(trip.plannedStartTime).toLocaleDateString()}</TableCell>
-                        <TableCell>{new Date(trip.plannedEndTime).toLocaleDateString()}</TableCell>
+                        <TableCell>{new Date(trip.projectedEndTime).toLocaleDateString()}</TableCell>
                       </TableRow>
                     ))
                   )}

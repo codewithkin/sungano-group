@@ -34,7 +34,10 @@ import {
   SelectValue,
 } from "@sungano-group/ui/components/select";
 import { Textarea } from "@sungano-group/ui/components/textarea";
+import { UploadDropzone, type UploadedFile } from "@sungano-group/upload/components/upload-dropzone";
 import { trpc } from "@/utils/trpc";
+
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? "";
 
 type DialogType = "driver" | "truck" | "trailer" | "customer" | "cost" | "trip" | null;
 
@@ -47,10 +50,10 @@ function CreateDriverDialog({ open, onClose }: DialogProps) {
   const queryClient = useQueryClient();
   const createDriver = useMutation({
     ...trpc.driver.create.mutationOptions(),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: trpc.driver.list.queryKey() });
       queryClient.invalidateQueries({ queryKey: trpc.driver.stats.queryKey() });
-      toast.success("Driver added");
+      toast.success(`Driver added — login: ${data.tempUsername} / ${data.tempPassword}`, { duration: 10000 });
       onClose();
     },
     onError: (err) => toast.error(err.message),
@@ -60,15 +63,13 @@ function CreateDriverDialog({ open, onClose }: DialogProps) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     createDriver.mutate({
-      userId: (form.get("userId") as string) || "",
+      name: (form.get("name") as string) || "",
+      email: (form.get("email") as string) || undefined,
       licenseNumber: (form.get("licenseNumber") as string) || "",
       licenseClass: (form.get("licenseClass") as string) || "",
       licenseExpiry: (form.get("licenseExpiry") as string) || "",
       phoneNumber: (form.get("phoneNumber") as string) || "",
       hireDate: (form.get("hireDate") as string) || "",
-      medicalExpiryDate: (form.get("medicalExpiryDate") as string) || undefined,
-      emergencyContact: (form.get("emergencyContact") as string) || undefined,
-      emergencyPhone: (form.get("emergencyPhone") as string) || undefined,
     });
   };
 
@@ -77,13 +78,17 @@ function CreateDriverDialog({ open, onClose }: DialogProps) {
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add Driver</DialogTitle>
-          <DialogDescription>Link an existing user to create a driver profile.</DialogDescription>
+          <DialogDescription>Create a driver profile and auto-generate login credentials.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="userId">User ID</Label>
-              <Input id="userId" name="userId" placeholder="Existing user ID" required />
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input id="name" name="name" placeholder="John Doe" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email (optional)</Label>
+              <Input id="email" name="email" type="email" placeholder="driver@company.com" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="licenseNumber">License Number</Label>
@@ -101,21 +106,9 @@ function CreateDriverDialog({ open, onClose }: DialogProps) {
               <Label htmlFor="hireDate">Hire Date</Label>
               <Input id="hireDate" name="hireDate" type="date" required />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-2">
               <Label htmlFor="phoneNumber">Phone Number</Label>
               <Input id="phoneNumber" name="phoneNumber" placeholder="+27 000 0000" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="medicalExpiryDate">Medical Expiry</Label>
-              <Input id="medicalExpiryDate" name="medicalExpiryDate" type="date" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="emergencyContact">Emergency Contact</Label>
-              <Input id="emergencyContact" name="emergencyContact" placeholder="Name" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="emergencyPhone">Emergency Phone</Label>
-              <Input id="emergencyPhone" name="emergencyPhone" placeholder="Contact number" />
             </div>
           </div>
           <DialogFooter>
@@ -149,14 +142,11 @@ function CreateTruckDialog({ open, onClose }: DialogProps) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     createTruck.mutate({
-      unitNumber: (form.get("unitNumber") as string) || "",
-      vin: (form.get("vin") as string) || "",
       make: (form.get("make") as string) || "",
       model: (form.get("model") as string) || "",
       year: Number(form.get("year") || 0),
       licensePlate: (form.get("licensePlate") as string) || "",
-      fuelType: (form.get("fuelType") as "DIESEL" | "PETROL" | "LNG" | "ELECTRIC") || "DIESEL",
-      tankCapacityLitres: Number(form.get("tankCapacityLitres") || 0),
+      fuelType: (form.get("fuelType") as "DIESEL" | "PETROL" | "LNG") || "DIESEL",
       mileage: Number(form.get("mileage") || 0),
     });
   };
@@ -170,14 +160,6 @@ function CreateTruckDialog({ open, onClose }: DialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="unitNumber">Unit Number</Label>
-              <Input id="unitNumber" name="unitNumber" placeholder="TRK-006" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="vin">VIN</Label>
-              <Input id="vin" name="vin" placeholder="1FUJGLDR..." required />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="make">Make</Label>
               <Input id="make" name="make" placeholder="Freightliner" required />
@@ -204,13 +186,8 @@ function CreateTruckDialog({ open, onClose }: DialogProps) {
                   <SelectItem value="DIESEL">Diesel</SelectItem>
                   <SelectItem value="PETROL">Petrol</SelectItem>
                   <SelectItem value="LNG">LNG</SelectItem>
-                  <SelectItem value="ELECTRIC">Electric</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="tankCapacityLitres">Tank Capacity (L)</Label>
-              <Input id="tankCapacityLitres" name="tankCapacityLitres" type="number" min="0" placeholder="400" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="mileage">Current Mileage (km)</Label>
@@ -248,10 +225,9 @@ function CreateTrailerDialog({ open, onClose }: DialogProps) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     createTrailer.mutate({
-      unitNumber: (form.get("unitNumber") as string) || "",
       type: (form.get("type") as "FLATBED" | "REEFER" | "DRY_VAN" | "TANKER" | "LOWBED" | "CURTAIN_SIDE" | "CONTAINER") || "FLATBED",
       capacityTonnes: Number(form.get("capacityTonnes") || 0),
-      licensePlate: (form.get("licensePlate") as string) || "",
+      licensePlate: (form.get("licensePlate") as string) || undefined,
     });
   };
 
@@ -264,10 +240,6 @@ function CreateTrailerDialog({ open, onClose }: DialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="unitNumber">Unit Number</Label>
-              <Input id="unitNumber" name="unitNumber" placeholder="TRL-012" required />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="type">Type</Label>
               <Select name="type" defaultValue="FLATBED">
@@ -289,9 +261,9 @@ function CreateTrailerDialog({ open, onClose }: DialogProps) {
               <Label htmlFor="capacityTonnes">Capacity (tonnes)</Label>
               <Input id="capacityTonnes" name="capacityTonnes" type="number" min="0" step="0.1" placeholder="30" required />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="licensePlate">License Plate</Label>
-              <Input id="licensePlate" name="licensePlate" placeholder="GP-TRL-012" required />
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="licensePlate">License Plate <span className="text-muted-foreground">(optional)</span></Label>
+              <Input id="licensePlate" name="licensePlate" placeholder="GP-TRL-012" />
             </div>
           </div>
           <DialogFooter>
@@ -330,8 +302,6 @@ function CreateCustomerDialog({ open, onClose }: DialogProps) {
       phone: (form.get("phone") as string) || undefined,
       address: (form.get("address") as string) || undefined,
       city: (form.get("city") as string) || undefined,
-      province: (form.get("province") as string) || undefined,
-      postalCode: (form.get("postalCode") as string) || undefined,
       notes: (form.get("notes") as string) || undefined,
     });
   };
@@ -361,17 +331,9 @@ function CreateCustomerDialog({ open, onClose }: DialogProps) {
               <Label htmlFor="address">Address</Label>
               <Input id="address" name="address" placeholder="123 Depot Rd" />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-2">
               <Label htmlFor="city">City</Label>
               <Input id="city" name="city" placeholder="Johannesburg" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="province">Province</Label>
-              <Input id="province" name="province" placeholder="Gauteng" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="postalCode">Postal Code</Label>
-              <Input id="postalCode" name="postalCode" placeholder="0001" />
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="notes">Notes</Label>
@@ -394,6 +356,7 @@ function CreateCustomerDialog({ open, onClose }: DialogProps) {
 
 function CreateCostDialog({ open, onClose }: DialogProps) {
   const queryClient = useQueryClient();
+  const [receipt, setReceipt] = useState<UploadedFile | null>(null);
   const createExpense = useMutation({
     ...trpc.cost.createExpense.mutationOptions(),
     onSuccess: () => {
@@ -401,6 +364,7 @@ function CreateCostDialog({ open, onClose }: DialogProps) {
       queryClient.invalidateQueries({ queryKey: trpc.cost.summary.queryKey() });
       queryClient.invalidateQueries({ queryKey: trpc.cost.monthlyCosts.queryKey() });
       toast.success("Cost captured");
+      setReceipt(null);
       onClose();
     },
     onError: (err) => toast.error(err.message),
@@ -420,7 +384,7 @@ function CreateCostDialog({ open, onClose }: DialogProps) {
       amount: Number(form.get("amount") || 0),
       date: (form.get("date") as string) || today,
       tripId: (form.get("tripId") as string) || undefined,
-      receiptUrl: (form.get("receiptUrl") as string) || undefined,
+      receiptUrl: receipt?.publicUrl ?? undefined,
     });
   };
 
@@ -483,8 +447,13 @@ function CreateCostDialog({ open, onClose }: DialogProps) {
               </Select>
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="receiptUrl">Receipt URL</Label>
-              <Input id="receiptUrl" name="receiptUrl" placeholder="https://..." />
+              <UploadDropzone
+                presignEndpoint={`${SERVER_URL}/api/upload/presign`}
+                label="Receipt (optional)"
+                value={receipt}
+                onUpload={setReceipt}
+                onRemove={() => setReceipt(null)}
+              />
             </div>
           </div>
           <DialogFooter>
@@ -534,7 +503,7 @@ function CreateTripDialog({ open, onClose }: DialogProps) {
       truckId: (form.get("truckId") as string) || "",
       trailerId: (form.get("trailerId") as string) || undefined,
       plannedStartTime: (form.get("plannedStartTime") as string) || defaultStart,
-      plannedEndTime: (form.get("plannedEndTime") as string) || defaultEnd,
+      projectedEndTime: (form.get("projectedEndTime") as string) || defaultEnd,
       plannedDistanceKm: form.get("plannedDistanceKm") ? Number(form.get("plannedDistanceKm")) : undefined,
       notes: (form.get("notes") as string) || undefined,
     });
@@ -616,8 +585,8 @@ function CreateTripDialog({ open, onClose }: DialogProps) {
               <Input id="plannedStartTime" name="plannedStartTime" type="datetime-local" defaultValue={defaultStart} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="plannedEndTime">End Time</Label>
-              <Input id="plannedEndTime" name="plannedEndTime" type="datetime-local" defaultValue={defaultEnd} required />
+              <Label htmlFor="projectedEndTime">Projected End Time</Label>
+              <Input id="projectedEndTime" name="projectedEndTime" type="datetime-local" defaultValue={defaultEnd} required />
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="notes">Notes</Label>

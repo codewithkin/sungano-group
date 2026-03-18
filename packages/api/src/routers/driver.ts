@@ -91,24 +91,35 @@ export const driverRouter = router({
   create: dispatcherProcedure
     .input(
       z.object({
-        userId: z.string(),
+        name: z.string().min(1),
+        email: z.string().email().optional(),
         licenseNumber: z.string().min(1),
         licenseClass: z.string().min(1),
         licenseExpiry: z.string().transform((s) => new Date(s)),
         phoneNumber: z.string().min(1),
         hireDate: z.string().transform((s) => new Date(s)),
-        medicalExpiryDate: z.string().transform((s) => new Date(s)).optional(),
-        emergencyContact: z.string().optional(),
-        emergencyPhone: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      // Update user role to DRIVER
-      await prisma.user.update({
-        where: { id: input.userId },
-        data: { role: "DRIVER" },
+      const { name, email, ...driverData } = input;
+      // Auto-generate username from name + random suffix
+      const base = name.toLowerCase().replace(/\s+/g, ".");
+      const suffix = Math.floor(1000 + Math.random() * 9000);
+      const username = `${base}.${suffix}`;
+      const tempPassword = Math.random().toString(36).slice(2, 10);
+      const { hashPassword } = await import("@sungano-group/auth");
+      const passwordHash = await hashPassword(tempPassword);
+
+      const user = await prisma.user.create({
+        data: { username, name, email, passwordHash, role: "DRIVER" },
       });
-      return prisma.driver.create({ data: input });
+
+      const driver = await prisma.driver.create({
+        data: { ...driverData, userId: user.id },
+        select: { id: true, userId: true, licenseNumber: true, licenseClass: true, phoneNumber: true },
+      });
+
+      return { driver, tempUsername: username, tempPassword };
     }),
 
   update: dispatcherProcedure

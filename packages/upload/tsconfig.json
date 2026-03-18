@@ -1,0 +1,15 @@
+{
+  "extends": "@sungano-group/config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@sungano-group/upload/server": ["./src/server.ts"],
+      "@sungano-group/upload/constants": ["./src/constants.ts"],
+      "@sungano-group/upload/components/*": ["./src/components/*.tsx"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}

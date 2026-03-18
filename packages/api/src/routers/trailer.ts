@@ -58,14 +58,18 @@ export const trailerRouter = router({
   create: dispatcherProcedure
     .input(
       z.object({
-        unitNumber: z.string().min(1),
         type: z.enum(["FLATBED", "REEFER", "DRY_VAN", "TANKER", "LOWBED", "CURTAIN_SIDE", "CONTAINER"]),
         capacityTonnes: z.number().positive(),
-        licensePlate: z.string().min(1),
+        licensePlate: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
-      return prisma.trailer.create({ data: input });
+      const count = await prisma.trailer.count();
+      const unitNumber = `TRL-${String(count + 1).padStart(3, "0")}`;
+      return prisma.trailer.create({
+        data: { ...input, unitNumber, licensePlate: input.licensePlate ?? "" },
+        select: { id: true, unitNumber: true, licensePlate: true, capacityTonnes: true },
+      });
     }),
 
   update: dispatcherProcedure

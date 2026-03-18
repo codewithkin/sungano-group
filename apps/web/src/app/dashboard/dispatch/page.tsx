@@ -91,7 +91,7 @@ function CreateTripDialog({ children }: { children: React.ReactNode }) {
       truckId: form.get("truckId") as string,
       trailerId: trailerId && trailerId !== "none" ? trailerId : undefined,
       plannedStartTime: form.get("plannedStartTime") as string,
-      plannedEndTime: form.get("plannedEndTime") as string,
+      projectedEndTime: form.get("projectedEndTime") as string,
       plannedDistanceKm: parseFloat(form.get("plannedDistanceKm") as string) || undefined,
       notes: (form.get("notes") as string) || undefined,
       shipmentIds: selectedShipments.length > 0 ? selectedShipments : undefined,
@@ -162,8 +162,8 @@ function CreateTripDialog({ children }: { children: React.ReactNode }) {
               <Input name="plannedStartTime" type="datetime-local" required />
             </div>
             <div className="space-y-2">
-              <Label>End Time *</Label>
-              <Input name="plannedEndTime" type="datetime-local" required />
+              <Label>Projected End Time *</Label>
+              <Input name="projectedEndTime" type="datetime-local" required />
             </div>
           </div>
 
@@ -254,6 +254,18 @@ function TripDetailSheet({ tripId, children }: { tripId: string; children: React
     onError: (err) => toast.error(err.message),
   });
 
+  const finishTrip = useMutation({
+    ...trpc.trip.finishTrip.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: trpc.trip.list.queryKey() });
+      queryClient.invalidateQueries({ queryKey: trpc.trip.byId.queryKey({ id: tripId }) });
+      queryClient.invalidateQueries({ queryKey: trpc.trip.stats.queryKey() });
+      queryClient.invalidateQueries({ queryKey: trpc.shipment.stats.queryKey() });
+      toast.success("Trip finished");
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const t = trip.data as any;
 
@@ -287,9 +299,14 @@ function TripDetailSheet({ tripId, children }: { tripId: string; children: React
                 </Button>
               )}
               {t.status === "IN_PROGRESS" && (
-                <Button size="sm" onClick={() => completeTrip.mutate({ id: t.id })}>
-                  <CheckCircle2 className="mr-1 size-3" /> Complete
-                </Button>
+                <div className="space-y-2">
+                  <Button size="sm" onClick={() => finishTrip.mutate({ id: t.id })} className="w-full">
+                    <CheckCircle2 className="mr-1 size-3" /> Finish Trip
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => completeTrip.mutate({ id: t.id })} className="w-full">
+                    <CheckCircle2 className="mr-1 size-3" /> Complete (Legacy)
+                  </Button>
+                </div>
               )}
             </div>
 
@@ -328,8 +345,8 @@ function TripDetailSheet({ tripId, children }: { tripId: string; children: React
                   <p>{new Date(t.plannedStartTime).toLocaleString()}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Planned End</p>
-                  <p>{new Date(t.plannedEndTime).toLocaleString()}</p>
+                  <p className="text-muted-foreground">Projected End</p>
+                  <p>{new Date(t.projectedEndTime).toLocaleString()}</p>
                 </div>
                 {t.actualStartTime && (
                   <div>
@@ -337,10 +354,10 @@ function TripDetailSheet({ tripId, children }: { tripId: string; children: React
                     <p>{new Date(t.actualStartTime).toLocaleString()}</p>
                   </div>
                 )}
-                {t.actualEndTime && (
+                {t.endTime && (
                   <div>
                     <p className="text-muted-foreground">Actual End</p>
-                    <p>{new Date(t.actualEndTime).toLocaleString()}</p>
+                    <p>{new Date(t.endTime).toLocaleString()}</p>
                   </div>
                 )}
               </div>
