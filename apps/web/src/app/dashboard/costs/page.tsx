@@ -238,15 +238,15 @@ export default function CostDashboardPage() {
             {s ? `${new Date(s.period.from).toLocaleDateString()} — ${new Date(s.period.to).toLocaleDateString()}` : "Last 30 days overview"}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
           <AddFuelLogDialog>
-            <Button variant="outline">
+            <Button variant="outline" className="w-full md:w-auto">
               <Fuel className="mr-2 size-4" />
               Log Fuel
             </Button>
           </AddFuelLogDialog>
           <AddExpenseDialog>
-            <Button>
+            <Button className="w-full md:w-auto">
               <Plus className="mr-2 size-4" />
               Record Expense
             </Button>

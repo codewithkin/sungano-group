@@ -643,10 +643,10 @@ export function DashboardActions() {
   const closeDialog = () => setDialog(null);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="w-full md:w-auto gap-2">
             <Plus className="size-4" />
             Add new
           </Button>
@@ -672,7 +672,7 @@ export function DashboardActions() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button size="sm" className="gap-2" onClick={() => setDialog("trip")}>
+      <Button size="sm" className="w-full md:w-auto gap-2" onClick={() => setDialog("trip")}>
         <Route className="size-4" />
         New Trip
       </Button>
