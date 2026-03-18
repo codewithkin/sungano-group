@@ -645,11 +645,9 @@ export function DashboardActions() {
   return (
     <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="w-full md:w-auto gap-2">
-            <Plus className="size-4" />
-            Add new
-          </Button>
+        <DropdownMenuTrigger className="inline-flex shrink-0 items-center justify-center border border-border rounded-xl bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 font-medium text-sm px-3 py-2 gap-2 w-full md:w-auto">
+          <Plus className="size-4" />
+          Add new
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel>Quick create</DropdownMenuLabel>
