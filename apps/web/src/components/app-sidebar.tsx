@@ -112,12 +112,12 @@ export function AppSidebar() {
                           (item.href !== "/dashboard" && pathname.startsWith(item.href));
                         return (
                           <SidebarMenuItem key={item.href}>
-                            <SidebarMenuButton asChild isActive={isActive} className={`group relative rounded-xl transition shadow-none hover:bg-muted/70 ${
+                            <SidebarMenuButton isActive={isActive} className={`group relative rounded-xl transition shadow-none hover:bg-muted/70 ${
                               isActive
                                 ? "bg-primary/10 text-primary before:absolute before:left-0 before:top-1 before:bottom-1 before:w-1 before:rounded-full before:bg-primary"
                                 : "text-foreground"
                             }`}>
-                              <Link href={item.href} className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
+                              <Link href={item.href} className="flex w-full items-center gap-3 group-data-[collapsible=icon]:justify-center">
                                 <item.icon className={`size-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
                                 <span className="truncate group-data-[collapsible=icon]:hidden">{item.title}</span>
                                 {item.badge ? (
