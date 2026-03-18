@@ -654,19 +654,19 @@ export function DashboardActions() {
           <DropdownMenuGroup>
             <DropdownMenuLabel>Quick create</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => setDialog("driver")}>
+            <DropdownMenuItem onClick={() => setDialog("driver")}>
               <UserRound className="mr-2 size-4" /> Driver
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setDialog("truck")}>
+            <DropdownMenuItem onClick={() => setDialog("truck")}>
               <Truck className="mr-2 size-4" /> Truck
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setDialog("trailer")}>
+            <DropdownMenuItem onClick={() => setDialog("trailer")}>
               <Package className="mr-2 size-4" /> Trailer
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setDialog("customer")}>
+            <DropdownMenuItem onClick={() => setDialog("customer")}>
               <Building2 className="mr-2 size-4" /> Customer
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setDialog("cost")}>
+            <DropdownMenuItem onClick={() => setDialog("cost")}>
               <DollarSign className="mr-2 size-4" /> Cost
             </DropdownMenuItem>
           </DropdownMenuGroup>
